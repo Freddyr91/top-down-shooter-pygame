@@ -1,12 +1,10 @@
-import pygame as pg
 from settings import *
 from map import *
-from environment import *
+import environment
 from camera import *
 from item import *
 from player import *
 from mob import *
-from bullet import *
 
 class Game:
     def __init__(self):
@@ -116,9 +114,9 @@ class Game:
         self.items = pg.sprite.Group()
         for row, tiles in enumerate(self.map.data):
             for col, tile in enumerate(tiles):
-                Grass(self, vec(col, row))
+                environment.Grass(self, vec(col, row))
                 if tile == '1':
-                    Wall(self, vec(col, row))
+                    environment.Wall(self, vec(col, row))
                 elif tile == 'P':
                     self.player = Player(self, vec(col, row))
                 elif tile == 'H':

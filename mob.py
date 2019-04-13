@@ -1,5 +1,5 @@
 from settings import *
-from splat import *
+import effects
 
 class Mob(pg.sprite.Sprite):
     def __init__(self, game, pos):
@@ -68,5 +68,5 @@ class Mob(pg.sprite.Sprite):
             self.rect.center = self.hit_rect.center
         if self.health <= 0:
             choice(self.game.enemy_hit_sounds).play()
-            Splat(self.game, self.pos)
+            effects.Splat(self.game, self.pos)
             self.kill()

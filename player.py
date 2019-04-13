@@ -1,6 +1,5 @@
 from settings import *
-from bullet import *
-from muzzleflash import *
+import effects
 
 class Player(pg.sprite.Sprite):
     def __init__(self, game, pos):
@@ -40,10 +39,12 @@ class Player(pg.sprite.Sprite):
         if (pg.mouse.get_pressed()[2] == True):
             self.weapon = "shotgun"
             self.shoot()
+
     def update(self):
         self.get_keys()
         mouse_dir = vec(self.game.camera.mouseadjustment(pg.mouse.get_pos())) - vec(self.pos)
         self.rot = mouse_dir.angle_to(vec(1,0))
+        ## TODO : add rotation if needed
         #self.image = pg.transform.rotate(self.game.player_img, self.rot)
         self.rect = self.image.get_rect()
         self.rect.center = self.pos
@@ -63,12 +64,12 @@ class Player(pg.sprite.Sprite):
             self.vel = vec(-WEAPONS[self.weapon]['kickback'], 0).rotate(-self.rot)
             for i in range(WEAPONS[self.weapon]['count']):
                 spread = uniform(-WEAPONS[self.weapon]['spread'], WEAPONS[self.weapon]['spread'])
-                Bullet(self.game, pos, dir.rotate(spread), self.weapon)
+                effects.Bullet(self.game, pos, dir.rotate(spread), self.weapon)
             snd = choice(self.game.weapon_sounds['gun'])
             if snd.get_num_channels() > 2:
                 snd.stop
             snd.play()
-            MuzzleFlash(self.game, pos, self.rot)
+            effects.Flash(self.game, pos, self.rot)
 
     def add_health(self, amount):
         self.health += amount
