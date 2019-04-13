@@ -26,7 +26,7 @@ class Bullet(pg.sprite.Sprite):
 
 class Splat(pg.sprite.Sprite):
     def __init__(self, game, pos):
-        self._layer = WALL_LAYER
+        self._layer = SPLAT_LAYER
         self.groups = game.all_sprites
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
