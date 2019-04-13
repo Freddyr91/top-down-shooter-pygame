@@ -1,4 +1,5 @@
 from settings import *
+from utils import *
 import effects
 
 class Player(pg.sprite.Sprite):

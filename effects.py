@@ -7,7 +7,7 @@ class Bullet(pg.sprite.Sprite):
         self.groups = game.all_sprites, game.bullets
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = game.bullet_img
+        self.image = choice(game.bullet_imgs)
         self.rect = self.image.get_rect()
         self.pos = pos
         self.rect.center = pos
@@ -16,7 +16,7 @@ class Bullet(pg.sprite.Sprite):
         self.rot = dir.angle_to(vec(1,0))
 
     def update(self):
-        self.image = pg.transform.rotate(self.game.bullet_img, self.rot)
+        self.image = pg.transform.rotate(choice(self.game.bullet_imgs), self.rot)
         self.pos += self.vel * self.game.dt
         self.rect.center = self.pos
         if pg.sprite.spritecollideany(self, self.game.walls):

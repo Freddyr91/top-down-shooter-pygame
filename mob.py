@@ -1,4 +1,5 @@
 from settings import *
+from utils import *
 import effects
 
 class Mob(pg.sprite.Sprite):
@@ -31,7 +32,7 @@ class Mob(pg.sprite.Sprite):
                     
     def select_mob_img(self):
         #TODO clean this
-        image = self.game.noise_img
+        image = choice(self.game.noise_imgs)
         img_size = image.get_rect().size
         
         mob_size = TILESIZE/2

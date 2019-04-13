@@ -21,30 +21,6 @@ class Game:
         pg.key.set_repeat(500, 100)
         self.load_data()
         pg.mouse.set_cursor(*pg.cursors.broken_x)
-        
-    def draw_text(self, text, font_name, size, color, x, y, align="nw"):
-        font = pg.font.Font(self.asset_folder + "/" + font_name, size)
-        text_surface = font.render(text, True, color)
-        text_rect = text_surface.get_rect()
-        if align == "nw":
-            text_rect.topleft = (x, y)
-        if align == "ne":
-            text_rect.topright = (x, y)
-        if align == "sw":
-            text_rect.bottomleft = (x, y)
-        if align == "se":
-            text_rect.bottomright = (x, y)
-        if align == "n":
-            text_rect.midtop = (x, y)
-        if align == "s":
-            text_rect.midbottom = (x, y)
-        if align == "e":
-            text_rect.midright = (x, y)
-        if align == "w":
-            text_rect.midleft = (x, y)
-        if align == "center":
-            text_rect.center = (x, y)
-        self.screen.blit(text_surface, text_rect)
 
     def load_data(self):
         game_folder = path.dirname('__file__')
@@ -58,38 +34,31 @@ class Game:
         self.dim_screen_img.fill((0,0,0,120))
         
         self.map = Map(path.join(self.asset_folder, 'map.txt'))
-        self.player_img = pg.image.load(path.join(img_folder, PLAYER_IMG)).convert_alpha()
-        self.wall_img = pg.image.load(path.join(img_folder, WALL_IMG)).convert_alpha()
-        self.wall_img = pg.transform.scale(self.wall_img, (TILESIZE, TILESIZE))
-        self.bullet_img = pg.image.load(path.join(img_folder, BULLET_IMG)).convert_alpha()
-        self.noise_img = pg.image.load(path.join(img_folder, NOISE_IMG)).convert_alpha()
-        self.grass_imgs = []
-        for img in GRASS_IMG:
-            self.grass_imgs.append(pg.image.load(path.join(img_folder, img)).convert_alpha())
-        self.flash_imgs = []
-        for img in BULLET_FLASH_IMGS:
-            self.flash_imgs.append(pg.image.load(path.join(img_folder, img)).convert_alpha())
-        self.item_imgs = {}
-        for item in ITEM_IMGS:
-            self.item_imgs[item] = pg.image.load(path.join(img_folder, ITEM_IMGS[item])).convert_alpha()
-        self.splat_imgs = []
-        for img in SPLAT_IMGS:
-            foo = pg.image.load(path.join(img_folder, img)).convert_alpha()
-            foo = pg.transform.scale(foo, (64, 64))
-            self.splat_imgs.append(foo)
+        self.player_img = load_images_in_folder(PLAYER_IMG, img_folder)
+        print ('player_img: ', self.player_img)
+        self.wall_img = load_images_in_folder(WALL_IMG, img_folder)
+        self.bullet_imgs = load_images_in_folder(BULLET_IMGS, img_folder)
+        self.noise_imgs = load_images_in_folder(NOISE_IMGS, img_folder)
+        self.floor_imgs = load_images_in_folder(FLOOR_IMGS, img_folder)
+        self.flash_imgs = load_images_in_folder(BULLET_FLASH_IMGS, img_folder)
+        self.item_imgs = load_images_in_folder(ITEM_IMGS, img_folder)
+        print ('item_imgs: ', self.item_imgs)
+        self.splat_imgs = load_images_in_folder(SPLAT_IMGS, img_folder)
         # Sound
         pg.mixer.music.load(path.join(music_folder, BG_MUSIC))
-        self.effect_sounds = {}
-        for type in EFFECTS_SOUNDS:
-            s = pg.mixer.Sound(path.join(snd_folder, EFFECTS_SOUNDS[type]))
-            s.set_volume(0.1)
-            self.effect_sounds[type] = s
-        self.weapon_sounds = {}
-        self.weapon_sounds['gun'] = []
-        for snd in WEAPON_SOUNDS_GUN:
-            s = pg.mixer.Sound(path.join(snd_folder, snd))
-            s.set_volume(.1)
-            self.weapon_sounds['gun'].append(s)
+        self.effect_sounds = load_sounds_in_folder(EFFECTS_SOUNDS, snd_folder)
+        #self.effect_sounds = {}
+        #for type in EFFECTS_SOUNDS:
+        #    s = pg.mixer.Sound(path.join(snd_folder, EFFECTS_SOUNDS[type]))
+        #    s.set_volume(0.1)
+        #    self.effect_sounds[type] = s
+        self.weapon_sounds = load_sounds_in_folder(WEAPON_SOUNDS, snd_folder)
+        #self.weapon_sounds = {}
+        #self.weapon_sounds['gun'] = []
+        #for snd in WEAPON_SOUNDS_GUN:
+        #    s = pg.mixer.Sound(path.join(snd_folder, snd))
+        #    s.set_volume(.1)
+        #    self.weapon_sounds['gun'].append(s)
         self.enemy_sounds = []
         for snd in ENEMY_SOUNDS:
             s = pg.mixer.Sound(path.join(snd_folder, snd))
@@ -114,7 +83,7 @@ class Game:
         self.items = pg.sprite.Group()
         for row, tiles in enumerate(self.map.data):
             for col, tile in enumerate(tiles):
-                environment.Grass(self, vec(col, row))
+                environment.Floor(self, vec(col, row))
                 if tile == '1':
                     environment.Wall(self, vec(col, row))
                 elif tile == 'P':
@@ -181,13 +150,13 @@ class Game:
         
         #HUD
         draw_player_health(self.screen, 10, 10, self.player.health)
-        self.draw_text("FPS " + "{:.2f}".format(self.clock.get_fps()), self.title_font, 24, WHITE, 120, 10, align = "nw")
+        draw_text(self, "FPS " + "{:.2f}".format(self.clock.get_fps()), self.title_font, 24, WHITE, 120, 10, align = "nw")
         if self.paused:
             self.screen.blit(self.dim_screen_img, (0,0))
-            self.draw_text("Paused", self.title_font, 105, RED, WIDTH/2, HEIGHT/2, align = "center")
-            self.draw_text("Press P to unpause game", self.title_font, 24, WHITE, WIDTH, 0, align = "ne")
+            draw_text(self, "Paused", self.title_font, 105, RED, WIDTH/2, HEIGHT/2, align = "center")
+            draw_text(self, "Press P to unpause game", self.title_font, 24, WHITE, WIDTH, 0, align = "ne")
         else:
-            self.draw_text("Press P to pause game", self.title_font, 24, WHITE, WIDTH, 0, align = "ne")
+            draw_text(self, "Press P to pause game", self.title_font, 24, WHITE, WIDTH, 0, align = "ne")
         pg.display.flip()
 
     def events(self):
