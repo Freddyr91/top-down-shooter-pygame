@@ -21,6 +21,7 @@ class Game:
         pg.key.set_repeat(500, 100)
         self.load_data()
         pg.mouse.set_cursor(*pg.cursors.broken_x)
+        self.muted = True
 
     def load_data(self):
         game_folder = path.dirname('__file__')
@@ -35,14 +36,12 @@ class Game:
         
         self.map = Map(path.join(self.asset_folder, 'map.txt'))
         self.player_img = load_images_in_folder(PLAYER_IMG, img_folder)
-        print ('player_img: ', self.player_img)
         self.wall_img = load_images_in_folder(WALL_IMG, img_folder)
         self.bullet_imgs = load_images_in_folder(BULLET_IMGS, img_folder)
         self.noise_imgs = load_images_in_folder(NOISE_IMGS, img_folder)
         self.floor_imgs = load_images_in_folder(FLOOR_IMGS, img_folder)
         self.flash_imgs = load_images_in_folder(BULLET_FLASH_IMGS, img_folder)
         self.item_imgs = load_images_in_folder(ITEM_IMGS, img_folder)
-        print ('item_imgs: ', self.item_imgs)
         self.splat_imgs = load_images_in_folder(SPLAT_IMGS, img_folder)
         # Sound
         pg.mixer.music.load(path.join(music_folder, BG_MUSIC))
@@ -98,12 +97,17 @@ class Game:
         self.paused = False
                 
         self.camera = Camera(self.map.width, self.map.height)
-        self.effect_sounds['level_start'].play()
+        if not self.muted:
+            self.effect_sounds['level_start'].play()
 
     def run(self):
         # game loop - set self.playing = False to end the game
         self.playing = True
         pg.mixer.music.play(loops=-1)
+
+        if self.muted:
+            pg.mixer.music.pause()
+
         while self.playing:
             self.dt = self.clock.tick(FPS) / 1000.0
             self.events()
@@ -124,12 +128,13 @@ class Game:
         for hit in hits:
             if hit.type == "health" and self.player.health < PLAYER_HEALTH:
                 hit.kill()
-                self.effect_sounds['health_up'].play()
+                if not self.muted:
+                    self.effect_sounds['health_up'].play()
                 self.player.add_health(ITEM_HEALTH_AMOUNT)
         # mob hits
         hits = pg.sprite.spritecollide(self.player, self.mobs, False, collide_hit_rect)
         for hit in hits:
-            if random() < 0.7:
+            if not self.muted and random() < 0.7:
                 choice(self.player_hit_sounds).play()
             self.player.health -= MOB_DAMAGE
             hit.vel = vec(0,0)
@@ -169,6 +174,14 @@ class Game:
                     self.quit()
                 if event.key == pg.K_p:
                     self.paused = not self.paused
+            elif event.type == pg.KEYUP:
+                if event.key == pg.K_m:
+                    if self.muted:
+                        pg.mixer.music.unpause()
+                        self.muted = False
+                    else:
+                        pg.mixer.music.pause()
+                        self.muted = True
 
     def show_start_screen(self):
         pass
