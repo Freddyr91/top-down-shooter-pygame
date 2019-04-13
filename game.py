@@ -46,31 +46,15 @@ class Game:
         # Sound
         pg.mixer.music.load(path.join(music_folder, BG_MUSIC))
         self.effect_sounds = load_sounds_in_folder(EFFECTS_SOUNDS, snd_folder)
-        #self.effect_sounds = {}
-        #for type in EFFECTS_SOUNDS:
-        #    s = pg.mixer.Sound(path.join(snd_folder, EFFECTS_SOUNDS[type]))
-        #    s.set_volume(0.1)
-        #    self.effect_sounds[type] = s
         self.weapon_sounds = load_sounds_in_folder(WEAPON_SOUNDS, snd_folder)
-        #self.weapon_sounds = {}
-        #self.weapon_sounds['gun'] = []
-        #for snd in WEAPON_SOUNDS_GUN:
-        #    s = pg.mixer.Sound(path.join(snd_folder, snd))
-        #    s.set_volume(.1)
-        #    self.weapon_sounds['gun'].append(s)
-        self.enemy_sounds = []
-        for snd in ENEMY_SOUNDS:
-            s = pg.mixer.Sound(path.join(snd_folder, snd))
+        self.enemy_sounds = load_sounds_in_folder(ENEMY_SOUNDS, snd_folder)
+        for s in self.enemy_sounds:
             s.set_volume(.2)
-            self.enemy_sounds.append(s)
-        self.player_hit_sounds = []
-        for snd in PLAYER_HIT_SOUNDS:
-            self.player_hit_sounds.append(pg.mixer.Sound(path.join(snd_folder, snd)))
-        self.enemy_hit_sounds = []
-        for snd in ENEMY_SOUNDS:
-            s = pg.mixer.Sound(path.join(snd_folder, snd))
+        self.player_hit_sounds = load_sounds_in_folder(PLAYER_HIT_SOUNDS, snd_folder)
+        ## TODO - Found other sound for this
+        self.enemy_hit_sounds = load_sounds_in_folder(ENEMY_SOUNDS, snd_folder)
+        for s in self.enemy_hit_sounds:
             s.set_volume(.2)
-            self.enemy_hit_sounds.append(s)
             
 
     def new(self):
@@ -160,6 +144,8 @@ class Game:
             self.screen.blit(self.dim_screen_img, (0,0))
             draw_text(self, "Paused", self.title_font, 105, RED, WIDTH/2, HEIGHT/2, align = "center")
             draw_text(self, "Press P to unpause game", self.title_font, 24, WHITE, WIDTH, 0, align = "ne")
+            draw_text(self, "Press M to toggle mute", self.title_font, 24, WHITE, WIDTH, 24, align = "ne")
+            draw_text(self, "Press R to restart game", self.title_font, 24, WHITE, WIDTH, 48, align = "ne")
         else:
             draw_text(self, "Press P to pause game", self.title_font, 24, WHITE, WIDTH, 0, align = "ne")
         pg.display.flip()
@@ -182,6 +168,9 @@ class Game:
                     else:
                         pg.mixer.music.pause()
                         self.muted = True
+                if event.key == pg.K_r:
+                    self.new()
+                    self.run()
 
     def show_start_screen(self):
         pass

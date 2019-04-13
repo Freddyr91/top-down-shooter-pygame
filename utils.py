@@ -93,7 +93,7 @@ def load_files_in_folder(filenames, folder, filetype):
         loaded_files = []
         for file in filenames:
             if (filetype == 'sound'):
-                s = pg.mixer.Sound(path.join(folder, filenames[file]))
+                s = pg.mixer.Sound(path.join(folder, file))
                 s.set_volume(0.1)
                 loaded_files.append(s)
             elif (filetype == 'image'):
