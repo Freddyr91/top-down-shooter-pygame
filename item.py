@@ -22,7 +22,7 @@ class Item(pg.sprite.Sprite):
         # bobbing motion
         offset = ITEM_BOB_RANGE * (self.tween(self.step / ITEM_BOB_RANGE) - 0.5)
         self.rect.centery = self.pos.y * TILESIZE + offset * self.dir
-        self.step += ITEM_BOB_SPEED
+        self.step += ITEM_BOB_SPEED * 60 / FPS
         if self.step > ITEM_BOB_RANGE:
             self.step = 0.0
             self.dir *= -1.0

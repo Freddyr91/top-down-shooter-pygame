@@ -23,7 +23,7 @@ BGCOLOR = DARKGREY
 TILESIZE = 64
 GRIDWIDTH = WIDTH / TILESIZE
 GRIDHEIGHT = HEIGHT / TILESIZE
-FPS = 60
+FPS = 144
 
 #game properties
 PLAYER_LAYER = 5
@@ -33,7 +33,7 @@ WALL_LAYER = 3
 SPLAT_LAYER = 2
 FLOOR_LAYER = 1
 
-TITLE = 'some game'
+TITLE = 'Space Shooter Thing'
 FONT = 'PIXEL-LI.TTF'
 
 # Player settings
@@ -44,7 +44,10 @@ PLAYER_HIT_RECT = pg.Rect(0,0,35,35)
 BARREL_OFFSET = vec(15, 0)
 
 NOISE_IMGS = ['noise.png']
-MOB_SPEEDS = [150, 180, 170, 225, 125]
+MOB_SIZES = ['normal', 'normal', 'normal', 'normal', 'normal', 'normal',
+             'big',
+             'small']
+MOB_SPEED = 250
 MOB_HIT_RECT = pg.Rect(0,0,30,30)
 MOB_HEALTH = 100
 MOB_DAMAGE = 10
@@ -81,7 +84,8 @@ PLAYER_HIT_SOUNDS = []
 for i in range(0,4):
     PLAYER_HIT_SOUNDS.append("hit" + str(i) + ".wav")
 WEAPON_SOUNDS = {}
-WEAPON_SOUNDS['gun'] = ['shoot.wav', 'shoot2.wav', 'shoot3.wav', 'shoot4.wav', 'shoot5.wav', 'shoot6.wav', 'shoot7.wav', 'shoot8.wav']
+WEAPON_SOUNDS['gun'] = ['shoot1.wav', 'shoot2.wav', 'shoot3.wav', 'shoot4.wav',
+                        'shoot5.wav', 'shoot6.wav', 'shoot7.wav', 'shoot8.wav']
 EFFECTS_SOUNDS = {'level_start': 'weird.wav',
                   'health_up': 'pickup.wav'}
 
@@ -96,13 +100,13 @@ WEAPONS['pistol'] = {'speed': 500,
                      'rate': 250,
                      'kickback': 200,
                      'spread': 5,
-                     'damage': 10,
+                     'damage': 20,
                      'size': 'lg',
                      'count': 1}
 WEAPONS['shotgun'] = {'speed': 400,
                       'lifetime': 500,
                       'rate': 900,
                       'kickback': 300,
-                      'spread': 20,
-                      'damage': 5,
-                      'count': 12}
+                      'spread': 5,
+                      'damage': 2,
+                      'count': 15}

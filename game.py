@@ -5,11 +5,11 @@ from camera import *
 from item import *
 from player import *
 from mob import *
+from soundManager import SoundManager
 
 class Game:
     def __init__(self):
-        pg.mixer.pre_init(44100, -16, 1, 2048)
-        pg.init()
+        self.soundManager = SoundManager()
         self.screen = pg.display.set_mode((WIDTH, HEIGHT))
 #        user32 = ctypes.windll.user32
 #        screenSize =  user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
@@ -21,7 +21,6 @@ class Game:
         pg.key.set_repeat(500, 100)
         self.load_data()
         pg.mouse.set_cursor(*pg.cursors.broken_x)
-        self.muted = True
 
     def load_data(self):
         game_folder = path.dirname('__file__')
@@ -81,16 +80,12 @@ class Game:
         self.paused = False
                 
         self.camera = Camera(self.map.width, self.map.height)
-        if not self.muted:
-            self.effect_sounds['level_start'].play()
+        self.soundManager.play_sound_effect(self.effect_sounds['level_start'])
 
     def run(self):
         # game loop - set self.playing = False to end the game
         self.playing = True
-        pg.mixer.music.play(loops=-1)
-
-        if self.muted:
-            pg.mixer.music.pause()
+        self.soundManager.play_music()
 
         while self.playing:
             self.dt = self.clock.tick(FPS) / 1000.0
@@ -112,14 +107,14 @@ class Game:
         for hit in hits:
             if hit.type == "health" and self.player.health < PLAYER_HEALTH:
                 hit.kill()
-                if not self.muted:
-                    self.effect_sounds['health_up'].play()
+                self.soundManager.play_sound_effect(self.effect_sounds['health_up'])
                 self.player.add_health(ITEM_HEALTH_AMOUNT)
         # mob hits
         hits = pg.sprite.spritecollide(self.player, self.mobs, False, collide_hit_rect)
         for hit in hits:
-            if not self.muted and random() < 0.7:
-                choice(self.player_hit_sounds).play()
+            if random() < 0.7:
+                self.soundManager.play_sound_effect(choice(self.player_hit_sounds))
+                
             self.player.health -= MOB_DAMAGE
             hit.vel = vec(0,0)
             if self.player.health <= 0:
@@ -162,12 +157,7 @@ class Game:
                     self.paused = not self.paused
             elif event.type == pg.KEYUP:
                 if event.key == pg.K_m:
-                    if self.muted:
-                        pg.mixer.music.unpause()
-                        self.muted = False
-                    else:
-                        pg.mixer.music.pause()
-                        self.muted = True
+                    self.soundManager.toggle_mute()
                 if event.key == pg.K_r:
                     self.new()
                     self.run()

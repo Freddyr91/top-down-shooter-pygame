@@ -66,11 +66,7 @@ class Player(pg.sprite.Sprite):
             for i in range(WEAPONS[self.weapon]['count']):
                 spread = uniform(-WEAPONS[self.weapon]['spread'], WEAPONS[self.weapon]['spread'])
                 effects.Bullet(self.game, pos, dir.rotate(spread), self.weapon)
-            if not self.game.muted:
-                snd = choice(self.game.weapon_sounds['gun'])
-                if snd.get_num_channels() > 2:
-                    snd.stop
-                snd.play()
+            self.game.soundManager.play_sound_effect(choice(self.game.weapon_sounds['gun']))
             effects.Flash(self.game, pos, self.rot)
 
     def add_health(self, amount):
