@@ -21,6 +21,7 @@ class Game:
         pg.key.set_repeat(500, 100)
         self.load_data()
         pg.mouse.set_cursor(*pg.cursors.broken_x)
+        self.map_progress = 0
 
     def load_data(self):
         game_folder = path.dirname('__file__')
@@ -33,8 +34,10 @@ class Game:
         self.dim_screen_img = pg.Surface(self.screen.get_size()).convert_alpha()
         self.dim_screen_img.fill((0,0,0,120))
         
-        self.map = Map(path.join(self.asset_folder, 'map.txt'))
-        self.player_img = load_images_in_folder(PLAYER_IMG, img_folder)
+        self.maps = load_maps(self.asset_folder)
+        self.player_imgs = load_images_in_folder(PLAYER_IMGS, img_folder)
+        for i in range (0, len(self.player_imgs)):
+            self.player_imgs[i] = pg.transform.scale(self.player_imgs[i], (TILESIZE, TILESIZE))
         self.wall_img = load_images_in_folder(WALL_IMG, img_folder)
         self.bullet_imgs = load_images_in_folder(BULLET_IMGS, img_folder)
         self.noise_imgs = load_images_in_folder(NOISE_IMGS, img_folder)
@@ -50,7 +53,7 @@ class Game:
         for s in self.enemy_sounds:
             s.set_volume(.2)
         self.player_hit_sounds = load_sounds_in_folder(PLAYER_HIT_SOUNDS, snd_folder)
-        ## TODO - Found other sound for this
+        ## TODO - Find other sound for this
         self.enemy_hit_sounds = load_sounds_in_folder(ENEMY_SOUNDS, snd_folder)
         for s in self.enemy_hit_sounds:
             s.set_volume(.2)
@@ -63,7 +66,7 @@ class Game:
         self.mobs = pg.sprite.Group()
         self.bullets = pg.sprite.Group()
         self.items = pg.sprite.Group()
-        for row, tiles in enumerate(self.map.data):
+        for row, tiles in enumerate(self.maps[self.map_progress].data):
             for col, tile in enumerate(tiles):
                 environment.Floor(self, vec(col, row))
                 if tile == '1':
@@ -72,14 +75,14 @@ class Game:
                     self.player = Player(self, vec(col, row))
                 elif tile == 'H':
                     Item(self, vec(col, row), "health")
-        for row, tiles in enumerate(self.map.data):
+        for row, tiles in enumerate(self.maps[self.map_progress].data):
             for col, tile in enumerate(tiles):
                 if tile == 'M':
                     Mob(self, vec(col, row))
                 
         self.paused = False
                 
-        self.camera = Camera(self.map.width, self.map.height)
+        self.camera = Camera(self.maps[self.map_progress].width, self.maps[self.map_progress].height)
         self.soundManager.play_sound_effect(self.effect_sounds['level_start'])
 
     def run(self):
@@ -143,7 +146,11 @@ class Game:
             draw_text(self, "Press R to restart game", self.title_font, 24, WHITE, WIDTH, 48, align = "ne")
         else:
             draw_text(self, "Press P to pause game", self.title_font, 24, WHITE, WIDTH, 0, align = "ne")
+        if len(self.mobs) == 0:
+            draw_text(self, "No more enemies", self.title_font, 64, GREEN2, WIDTH/2, HEIGHT/4, align = "center")
+            draw_text(self, "Press Space to go to next level", self.title_font, 64, WHITE, WIDTH/2, HEIGHT/4+70, align = "center")
         pg.display.flip()
+
 
     def events(self):
         # catch all events here
@@ -159,6 +166,13 @@ class Game:
                 if event.key == pg.K_m:
                     self.soundManager.toggle_mute()
                 if event.key == pg.K_r:
+                    self.new()
+                    self.run()
+                if event.key == pg.K_SPACE and len(self.mobs) == 0:
+                    if self.map_progress < len(self.maps) - 1:
+                        self.map_progress += 1
+                    else:
+                        self.map_progress = 0
                     self.new()
                     self.run()
 

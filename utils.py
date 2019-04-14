@@ -1,4 +1,5 @@
 from settings import *
+from map import Map
 
 def collide_with_walls(sprite, group, dir):
     if dir == 'x':
@@ -115,3 +116,9 @@ def load_sounds_in_folder(filenames, folder):
 
 def load_images_in_folder(filenames, folder):
     return load_files_in_folder(filenames, folder, 'image')
+
+def load_maps(folder):
+    maps = []
+    for map_filename in MAPS:
+        maps.append(Map(path.join(folder, map_filename)))
+    return maps

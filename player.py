@@ -8,8 +8,7 @@ class Player(pg.sprite.Sprite):
         self.groups = game.all_sprites
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = game.player_img
-        self.image = pg.transform.scale(self.image,(48, 48))
+        self.image = game.player_imgs[0]
         self.rect = self.image.get_rect()
         self.hit_rect = PLAYER_HIT_RECT
         self.hit_rect.center = self.rect.center
@@ -45,11 +44,14 @@ class Player(pg.sprite.Sprite):
         self.get_keys()
         mouse_dir = vec(self.game.camera.mouseadjustment(pg.mouse.get_pos())) - vec(self.pos)
         self.rot = mouse_dir.angle_to(vec(1,0))
-        ## TODO : add rotation if needed
-        #self.image = pg.transform.rotate(self.game.player_img, self.rot)
+        posBefore = self.pos
+        self.pos += self.vel * self.game.dt
+        if self.vel != vec(0,0):
+            self.image = pg.transform.rotate(self.game.player_imgs[1], self.rot)
+        else:
+            self.image = pg.transform.rotate(self.game.player_imgs[0], self.rot)
         self.rect = self.image.get_rect()
         self.rect.center = self.pos
-        self.pos += self.vel * self.game.dt
         self.hit_rect.centerx = self.pos.x
         collide_with_walls(self, self.game.walls, 'x')
         self.hit_rect.centery = self.pos.y

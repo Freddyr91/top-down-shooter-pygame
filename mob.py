@@ -26,6 +26,8 @@ class Mob(pg.sprite.Sprite):
         self.rect.center = self.pos
         self.rot = 0
         self.health = round(MOB_HEALTH * self.toughness)
+        if mob_size == 'big':
+            self.health = self.health * 4
         self.speed = MOB_SPEED / self.toughness
         self.target = game.player
         

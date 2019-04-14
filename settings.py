@@ -25,6 +25,8 @@ GRIDWIDTH = WIDTH / TILESIZE
 GRIDHEIGHT = HEIGHT / TILESIZE
 FPS = 144
 
+MAPS = ['map1.txt', 'map2.txt']
+
 #game properties
 PLAYER_LAYER = 5
 MOB_LAYER = 5
@@ -39,7 +41,7 @@ FONT = 'PIXEL-LI.TTF'
 # Player settings
 PLAYER_HEALTH = 100
 PLAYER_SPEED = 300
-PLAYER_IMG = 'player.png'
+PLAYER_IMGS = ['spaceship_still.png', 'spaceship_moving.png']
 PLAYER_HIT_RECT = pg.Rect(0,0,35,35)
 BARREL_OFFSET = vec(15, 0)
 
