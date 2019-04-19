@@ -30,36 +30,36 @@ class Mob(pg.sprite.Sprite):
             self.health = self.health * 4
         self.speed = MOB_SPEED / self.toughness
         self.target = game.player
-        
+
     def avoid_mobs(self):
         for mob in self.game.mobs:
             if mob != self:
                 dist = self.pos - mob.pos
                 if 0 < dist.length() < MOB_AVOID_RADIUS:
                     self.acc += dist.normalize()
-                    
+
     def select_mob_img(self):
         #TODO clean this
         image = choice(self.game.noise_imgs)
         img_size = image.get_rect().size
-        
+
         mob_size = round(TILESIZE/2 * self.toughness)
-        
+
         x = randint(0, img_size[0] - mob_size)
         y = randint(0, img_size[1] - mob_size)
-        
+
         newimg = pg.Surface((mob_size, mob_size)).convert_alpha()
-        newimg.blit(image, (0, 0), (x,y, mob_size, mob_size))        
-        
+        newimg.blit(image, (0, 0), (x,y, mob_size, mob_size))
+
         self.image = newimg
-        
+
 
     def update(self):
         target_dist = self.target.pos - self.pos
         if target_dist.length_squared() < MOB_DETECT_RADIUS**2:
             if random() < 0.001:
                 self.game.soundManager.play_sound_effect(choice(self.game.enemy_sounds))
-            
+
             self.rot = (target_dist).angle_to(vec(1, 0))
             ## TODO - Add rotation if needed
             self.image = pg.transform.rotate(self.image_copy, self.rot)

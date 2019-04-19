@@ -52,7 +52,7 @@ class Flash(pg.sprite.Sprite):
         self.pos = pos
         self.rect.center = pos
         self.spawn_time = pg.time.get_ticks()
-        
+
     def update(self):
         if pg.time.get_ticks() - self.spawn_time > BULLET_FLASH_DUR:
             self.kill()

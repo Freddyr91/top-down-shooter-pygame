@@ -17,7 +17,7 @@ class Item(pg.sprite.Sprite):
         self.tween = tween.easeInOutSine
         self.step = 0
         self.dir = 1
-        
+
     def update(self):
         # bobbing motion
         offset = ITEM_BOB_RANGE * (self.tween(self.step / ITEM_BOB_RANGE) - 0.5)

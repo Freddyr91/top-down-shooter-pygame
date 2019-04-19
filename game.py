@@ -33,7 +33,7 @@ class Game:
         self.title_font = path.join(game_folder, FONT)
         self.dim_screen_img = pg.Surface(self.screen.get_size()).convert_alpha()
         self.dim_screen_img.fill((0,0,0,120))
-        
+
         self.maps = load_maps(self.asset_folder)
         self.player_imgs = load_images_in_folder(PLAYER_IMGS, img_folder)
         for i in range (0, len(self.player_imgs)):
@@ -57,7 +57,7 @@ class Game:
         self.enemy_hit_sounds = load_sounds_in_folder(ENEMY_SOUNDS, snd_folder)
         for s in self.enemy_hit_sounds:
             s.set_volume(.2)
-            
+
 
     def new(self):
         # initialize all variables and do all the setup for a new game
@@ -79,9 +79,9 @@ class Game:
             for col, tile in enumerate(tiles):
                 if tile == 'M':
                     Mob(self, vec(col, row))
-                
+
         self.paused = False
-                
+
         self.camera = Camera(self.maps[self.map_progress].width, self.maps[self.map_progress].height)
         self.soundManager.play_sound_effect(self.effect_sounds['level_start'])
 
@@ -94,7 +94,7 @@ class Game:
             self.dt = self.clock.tick(FPS) / 1000.0
             self.events()
             if not self.paused:
-                self.update()                
+                self.update()
             self.draw()
 
     def quit(self):
@@ -117,7 +117,7 @@ class Game:
         for hit in hits:
             if random() < 0.7:
                 self.soundManager.play_sound_effect(choice(self.player_hit_sounds))
-                
+
             self.player.health -= MOB_DAMAGE
             hit.vel = vec(0,0)
             if self.player.health <= 0:
@@ -134,7 +134,7 @@ class Game:
         self.screen.fill(BGCOLOR)
         for sprite in self.all_sprites:
             self.screen.blit(sprite.image, self.camera.apply(sprite))
-        
+
         #HUD
         draw_player_health(self.screen, 10, 10, self.player.health)
         draw_text(self, "FPS " + "{:.2f}".format(self.clock.get_fps()), self.title_font, 24, WHITE, 120, 10, align = "nw")
