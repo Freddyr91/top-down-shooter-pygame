@@ -1,10 +1,9 @@
 from settings import *
-from map import *
 import environment
 from camera import *
 from item import *
 from player import *
-from mob import *
+from mob import Mob
 from soundManager import SoundManager
 
 class Game:

@@ -1,8 +1,8 @@
-from settings import *
+import settings as conf
 
 class Camera:
     def __init__(self, width, height):
-        self.camera = pg.Rect(0, 0, width, height)
+        self.camera = conf.pg.Rect(0, 0, width, height)
         self.width = width
         self.height = height
 
@@ -10,11 +10,11 @@ class Camera:
         return entity.rect.move(self.camera.topleft)
 
     def mouseadjustment(self, mouse):
-        return vec(mouse) + vec(-self.camera.left, -self.camera.top)
+        return conf.vec(mouse) + conf.vec(-self.camera.left, -self.camera.top)
 
     def update(self, target):
-        x = -target.rect.centerx + int(WIDTH / 2)
-        y = -target.rect.centery + int(HEIGHT / 2)
+        x = -target.rect.centerx + int(conf.WIDTH / 2)
+        y = -target.rect.centery + int(conf.HEIGHT / 2)
 
         #TODO move camera according to mouse position
         #mouse_dir = vec(self.mouseadjustment(pg.mouse.get_pos())) - vec(target.pos)
@@ -23,7 +23,7 @@ class Camera:
         # limit scolling to map size
         x = min(0, x) #left
         y = min(0, y) #top
-        x = max(-(self.width - WIDTH), x)
-        y = max(-(self.height - HEIGHT), y)
-        #y = max(WIDTH/TILESIZE, y)
-        self.camera = pg.Rect(x, y, self.width, self.height)
+        x = max(-(self.width - conf.WIDTH), x)
+        y = max(-(self.height - conf.HEIGHT), y)
+        #y = max(conf.WIDTH/conf.TILESIZE, y)
+        self.camera = conf.pg.Rect(x, y, self.width, self.height)

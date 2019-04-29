@@ -1,4 +1,4 @@
-from settings import *
+import settings as conf
 
 class Map:
     def __init__(self, filename):
@@ -9,5 +9,5 @@ class Map:
 
         self.tilewidth = len(self.data[0])
         self.tileheight = len(self.data)
-        self.width = self.tilewidth * TILESIZE
-        self.height = self.tileheight * TILESIZE
+        self.width = self.tilewidth * conf.TILESIZE
+        self.height = self.tileheight * conf.TILESIZE
