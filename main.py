@@ -1,7 +1,6 @@
-from settings import *
-from game import *
+import game
 
-g = Game()
+g = game.Game()
 g.show_start_screen()
 while True:
     g.new()
