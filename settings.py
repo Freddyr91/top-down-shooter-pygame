@@ -5,6 +5,7 @@ import random
 from random import choice, randint, random, uniform
 from os import path
 import pygame as pg
+import ctypes
 
 vec = pg.math.Vector2
 
@@ -25,7 +26,12 @@ GRIDWIDTH = WIDTH / TILESIZE
 GRIDHEIGHT = HEIGHT / TILESIZE
 FPS = 144
 
+#map properties
 MAPS = ['map1.txt', 'map2.txt']
+WALL_TILE = '1'
+PLAYER_TILE = 'P'
+HEALTH_TILE = 'H'
+MOB_TILE = 'M'
 
 #game properties
 PLAYER_LAYER = 5
@@ -48,7 +54,7 @@ BARREL_OFFSET = vec(15, 0)
 NOISE_IMGS = ['noise.png']
 MOB_SIZES = ['normal', 'normal', 'normal', 'normal', 'normal', 'normal',
              'big',
-             'small']
+             'small', 'small', 'small']
 MOB_SPEED = 250
 MOB_HIT_RECT = pg.Rect(0,0,30,30)
 MOB_HEALTH = 100

@@ -3,19 +3,20 @@ import utils
 import effects
 
 class Mob(conf.pg.sprite.Sprite):
-    def __init__(self, game, pos):
+    def __init__(self, game, pos, forceNormal = False, rot = 0):
         self._layer = conf.MOB_LAYER
         self.groups = game.all_sprites, game.mobs
         conf.pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.toughness = conf.uniform(0.9,1.2)
-        mob_size = conf.choice(conf.MOB_SIZES)
-        if mob_size == 'big':
-            self.toughness = conf.uniform(1.5,1.8)
-        elif mob_size == 'small':
-            self.toughness = conf.uniform(0.3,0.6)
+        self.mob_size = 'normal'
+        if (not forceNormal):
+            self.mob_size = conf.choice(conf.MOB_SIZES)
+            if self.mob_size == 'big':
+                self.toughness = conf.uniform(1.5,1.8)
+            elif self.mob_size == 'small':
+                self.toughness = conf.uniform(0.3,0.6)
         self.select_mob_img()
-#        self.image = choice(game.mob_imgs).copy()
         self.image_copy = self.image.copy()
         self.rect = self.image.get_rect()
         self.hit_rect = conf.MOB_HIT_RECT.copy()
@@ -23,11 +24,9 @@ class Mob(conf.pg.sprite.Sprite):
         self.pos = pos * conf.TILESIZE
         self.vel = conf.vec(0, 0)
         self.acc = conf.vec(0, 0)
-        self.rect.center = self.pos
-        self.rot = 0
+        self.rect.center = pos * conf.TILESIZE
+        self.rot = rot
         self.health = round(conf.MOB_HEALTH * self.toughness)
-        if mob_size == 'big':
-            self.health = self.health * 4
         self.speed = conf.MOB_SPEED / self.toughness
         self.target = game.player
 
@@ -79,4 +78,10 @@ class Mob(conf.pg.sprite.Sprite):
         if self.health <= 0:
             self.game.soundManager.play_sound_effect(conf.choice(self.game.enemy_hit_sounds))
             effects.Splat(self.game, self.pos)
+            if self.mob_size == 'big':
+                Mob(self.game, (self.pos-conf.vec(1,0))/conf.TILESIZE, True, self.rot)
+                Mob(self.game, (self.pos-conf.vec(0,1))/conf.TILESIZE, True, self.rot)
+                Mob(self.game, (self.pos+conf.vec(1,0))/conf.TILESIZE, True, self.rot)
+                Mob(self.game, (self.pos+conf.vec(0,1))/conf.TILESIZE, True, self.rot)
             self.kill()
+            self.game.player.add_points(100)

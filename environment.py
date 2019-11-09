@@ -9,7 +9,7 @@ class Wall(conf.pg.sprite.Sprite):
         self.image = game.wall_img
         self.rect = self.image.get_rect()
         self.pos = pos
-        self.rect.topleft = pos * conf.TILESIZE
+        self.rect.center = pos * conf.TILESIZE
 
 class Floor(conf.pg.sprite.Sprite):
     def __init__(self, game, pos):

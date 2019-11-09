@@ -17,7 +17,7 @@ class Camera:
         y = -target.rect.centery + int(conf.HEIGHT / 2)
 
         #TODO move camera according to mouse position
-        #mouse_dir = vec(self.mouseadjustment(pg.mouse.get_pos())) - vec(target.pos)
+        #mouse_dir = conf.vec(self.mouseadjustment(conf.pg.mouse.get_pos())) - conf.vec(target.pos)
         #mouse_mag = mouse_dir.length() / 10
 
         # limit scolling to map size
@@ -25,5 +25,4 @@ class Camera:
         y = min(0, y) #top
         x = max(-(self.width - conf.WIDTH), x)
         y = max(-(self.height - conf.HEIGHT), y)
-        #y = max(conf.WIDTH/conf.TILESIZE, y)
         self.camera = conf.pg.Rect(x, y, self.width, self.height)

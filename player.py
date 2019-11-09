@@ -21,18 +21,22 @@ class Player(pg.sprite.Sprite):
         self.last_shot_shotgun = 0
         self.health = conf.PLAYER_HEALTH
         self.weapon = "pistol"
+        self.points_current_level = 0
 
     def get_keys(self):
         self.vel = conf.vec(0, 0)
         keys = pg.key.get_pressed()
+        speed = conf.PLAYER_SPEED
+        if keys[pg.K_LSHIFT]:
+            speed = speed * 1.4
         if keys[pg.K_LEFT] or keys[pg.K_a]:
-            self.vel.x = -conf.PLAYER_SPEED
+            self.vel.x = -speed
         if keys[pg.K_RIGHT] or keys[pg.K_d]:
-            self.vel.x = conf.PLAYER_SPEED
+            self.vel.x = speed
         if keys[pg.K_UP] or keys[pg.K_w]:
-            self.vel.y = -conf.PLAYER_SPEED
+            self.vel.y = -speed
         if keys[pg.K_DOWN] or keys[pg.K_s]:
-            self.vel.y = conf.PLAYER_SPEED
+            self.vel.y = speed
         if self.vel.x != 0 and self.vel.y != 0:
             self.vel *= 0.7071
         if (pg.mouse.get_pressed()[0] == True):
@@ -77,3 +81,6 @@ class Player(pg.sprite.Sprite):
         self.health += amount
         if self.health > conf.PLAYER_HEALTH:
             self.health = conf.PLAYER_HEALTH
+
+    def add_points(self, pointsToAdd):
+        self.points_current_level += pointsToAdd

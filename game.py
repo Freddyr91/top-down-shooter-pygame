@@ -1,4 +1,4 @@
-from settings import *
+import settings as conf
 import environment
 from camera import *
 from item import *
@@ -9,18 +9,22 @@ from soundManager import SoundManager
 class Game:
     def __init__(self):
         self.soundManager = SoundManager()
-        self.screen = pg.display.set_mode((WIDTH, HEIGHT))
-#        user32 = ctypes.windll.user32
-#        screenSize =  user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
-#        print screenSize
-#        size = (screenSize)
-#        pg.display.set_mode((size) , pg.FULLSCREEN)
-        pg.display.set_caption(TITLE)
+        # Full-screen test stuff
+        #user32 = conf.ctypes.windll.user32
+        #screenSize =  user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
+        #print(screenSize)
+        #size = (screenSize)
+        #pg.display.set_mode((size) , pg.FULLSCREEN)
+        #pg.display.set_caption(conf.TITLE)
+        #conf.WIDTH = screenSize[0]
+        #conf.HEIGHT = screenSize[1]
+        self.screen = conf.pg.display.set_mode((conf.WIDTH, conf.HEIGHT))
         self.clock = pg.time.Clock()
         pg.key.set_repeat(500, 100)
         self.load_data()
         pg.mouse.set_cursor(*pg.cursors.broken_x)
         self.map_progress = 0
+        self.points = 0
 
     def load_data(self):
         game_folder = path.dirname('__file__')
@@ -29,31 +33,31 @@ class Game:
         music_folder = path.join(game_folder, 'music')
         self.asset_folder = path.join(game_folder, 'assets')
 
-        self.title_font = path.join(game_folder, FONT)
+        self.title_font = path.join(game_folder, conf.FONT)
         self.dim_screen_img = pg.Surface(self.screen.get_size()).convert_alpha()
         self.dim_screen_img.fill((0,0,0,120))
 
         self.maps = load_maps(self.asset_folder)
-        self.player_imgs = load_images_in_folder(PLAYER_IMGS, img_folder)
+        self.player_imgs = load_images_in_folder(conf.PLAYER_IMGS, img_folder)
         for i in range (0, len(self.player_imgs)):
-            self.player_imgs[i] = pg.transform.scale(self.player_imgs[i], (TILESIZE, TILESIZE))
-        self.wall_img = load_images_in_folder(WALL_IMG, img_folder)
-        self.bullet_imgs = load_images_in_folder(BULLET_IMGS, img_folder)
-        self.noise_imgs = load_images_in_folder(NOISE_IMGS, img_folder)
-        self.floor_imgs = load_images_in_folder(FLOOR_IMGS, img_folder)
-        self.flash_imgs = load_images_in_folder(BULLET_FLASH_IMGS, img_folder)
-        self.item_imgs = load_images_in_folder(ITEM_IMGS, img_folder)
-        self.splat_imgs = load_images_in_folder(SPLAT_IMGS, img_folder)
+            self.player_imgs[i] = pg.transform.scale(self.player_imgs[i], (conf.TILESIZE, conf.TILESIZE))
+        self.wall_img = load_images_in_folder(conf.WALL_IMG, img_folder)
+        self.bullet_imgs = load_images_in_folder(conf.BULLET_IMGS, img_folder)
+        self.noise_imgs = load_images_in_folder(conf.NOISE_IMGS, img_folder)
+        self.floor_imgs = load_images_in_folder(conf.FLOOR_IMGS, img_folder)
+        self.flash_imgs = load_images_in_folder(conf.BULLET_FLASH_IMGS, img_folder)
+        self.item_imgs = load_images_in_folder(conf.ITEM_IMGS, img_folder)
+        self.splat_imgs = load_images_in_folder(conf.SPLAT_IMGS, img_folder)
         # Sound
-        pg.mixer.music.load(path.join(music_folder, BG_MUSIC))
-        self.effect_sounds = load_sounds_in_folder(EFFECTS_SOUNDS, snd_folder)
-        self.weapon_sounds = load_sounds_in_folder(WEAPON_SOUNDS, snd_folder)
-        self.enemy_sounds = load_sounds_in_folder(ENEMY_SOUNDS, snd_folder)
+        pg.mixer.music.load(path.join(music_folder, conf.BG_MUSIC))
+        self.effect_sounds = load_sounds_in_folder(conf.EFFECTS_SOUNDS, snd_folder)
+        self.weapon_sounds = load_sounds_in_folder(conf.WEAPON_SOUNDS, snd_folder)
+        self.enemy_sounds = load_sounds_in_folder(conf.ENEMY_SOUNDS, snd_folder)
         for s in self.enemy_sounds:
             s.set_volume(.2)
-        self.player_hit_sounds = load_sounds_in_folder(PLAYER_HIT_SOUNDS, snd_folder)
+        self.player_hit_sounds = load_sounds_in_folder(conf.PLAYER_HIT_SOUNDS, snd_folder)
         ## TODO - Find other sound for this
-        self.enemy_hit_sounds = load_sounds_in_folder(ENEMY_SOUNDS, snd_folder)
+        self.enemy_hit_sounds = load_sounds_in_folder(conf.ENEMY_SOUNDS, snd_folder)
         for s in self.enemy_hit_sounds:
             s.set_volume(.2)
 
@@ -67,17 +71,17 @@ class Game:
         self.items = pg.sprite.Group()
         for row, tiles in enumerate(self.maps[self.map_progress].data):
             for col, tile in enumerate(tiles):
-                environment.Floor(self, vec(col, row))
-                if tile == '1':
-                    environment.Wall(self, vec(col, row))
-                elif tile == 'P':
-                    self.player = Player(self, vec(col, row))
-                elif tile == 'H':
-                    Item(self, vec(col, row), "health")
+                environment.Floor(self, conf.vec(col, row))
+                if tile == conf.WALL_TILE:
+                    environment.Wall(self, conf.vec(col, row))
+                elif tile == conf.PLAYER_TILE:
+                    self.player = Player(self, conf.vec(col, row))
+                elif tile == conf.HEALTH_TILE:
+                    Item(self, conf.vec(col, row), "health")
         for row, tiles in enumerate(self.maps[self.map_progress].data):
             for col, tile in enumerate(tiles):
-                if tile == 'M':
-                    Mob(self, vec(col, row))
+                if tile == conf.MOB_TILE:
+                    Mob(self, conf.vec(col, row))
 
         self.paused = False
 
@@ -90,7 +94,7 @@ class Game:
         self.soundManager.play_music()
 
         while self.playing:
-            self.dt = self.clock.tick(FPS) / 1000.0
+            self.dt = self.clock.tick(conf.FPS) / 1000.0
             self.events()
             if not self.paused:
                 self.update()
@@ -98,7 +102,7 @@ class Game:
 
     def quit(self):
         pg.quit()
-        sys.exit()
+        #sys.exit()
 
     def update(self):
         # update portion of the game loop
@@ -107,47 +111,48 @@ class Game:
         # player picks up health
         hits = pg.sprite.spritecollide(self.player, self.items, False, collide_hit_rect)
         for hit in hits:
-            if hit.type == "health" and self.player.health < PLAYER_HEALTH:
+            if hit.type == "health" and self.player.health < conf.PLAYER_HEALTH:
                 hit.kill()
                 self.soundManager.play_sound_effect(self.effect_sounds['health_up'])
-                self.player.add_health(ITEM_HEALTH_AMOUNT)
+                self.player.add_health(conf.ITEM_HEALTH_AMOUNT)
         # mob hits
         hits = pg.sprite.spritecollide(self.player, self.mobs, False, collide_hit_rect)
         for hit in hits:
-            if random() < 0.7:
-                self.soundManager.play_sound_effect(choice(self.player_hit_sounds))
+            if conf.random() < 0.7:
+                self.soundManager.play_sound_effect(conf.choice(self.player_hit_sounds))
 
-            self.player.health -= MOB_DAMAGE
-            hit.vel = vec(0,0)
+            self.player.health -= conf.MOB_DAMAGE
+            hit.vel = conf.vec(0,0)
             if self.player.health <= 0:
                 self.playing = False
         if hits:
-            self.player.pos += vec(MOB_KNOCKBACK, 0).rotate(-hits[0].rot)
+            self.player.pos += conf.vec(conf.MOB_KNOCKBACK, 0).rotate(-hits[0].rot)
         # bullets hit mob
         hits = pg.sprite.groupcollide(self.mobs, self.bullets, False, True)
         for hit in hits:
-            hit.health -= WEAPONS[self.player.weapon]['damage'] * len(hits[hit])
-            hit.vel = vec(0,0)
+            hit.health -= conf.WEAPONS[self.player.weapon]['damage'] * len(hits[hit])
+            hit.vel = conf.vec(0,0)
 
     def draw(self):
-        self.screen.fill(BGCOLOR)
+        self.screen.fill(conf.BGCOLOR)
         for sprite in self.all_sprites:
             self.screen.blit(sprite.image, self.camera.apply(sprite))
 
         #HUD
         draw_player_health(self.screen, 10, 10, self.player.health)
-        draw_text(self, "FPS " + "{:.2f}".format(self.clock.get_fps()), self.title_font, 24, WHITE, 120, 10, align = "nw")
+        draw_text(self, "FPS " + "{:.2f}".format(self.clock.get_fps()), self.title_font, 24, conf.WHITE, 120, 10, align = "nw")
+        draw_text(self, "Points " + "{}".format(self.points + self.player.points_current_level), self.title_font, 24, conf.WHITE, 10, conf.HEIGHT-10, align = "sw")
         if self.paused:
             self.screen.blit(self.dim_screen_img, (0,0))
-            draw_text(self, "Paused", self.title_font, 105, RED, WIDTH/2, HEIGHT/2, align = "center")
-            draw_text(self, "Press P to unpause game", self.title_font, 24, WHITE, WIDTH, 0, align = "ne")
-            draw_text(self, "Press M to toggle mute", self.title_font, 24, WHITE, WIDTH, 24, align = "ne")
-            draw_text(self, "Press R to restart game", self.title_font, 24, WHITE, WIDTH, 48, align = "ne")
+            draw_text(self, "Paused", self.title_font, 105, conf.RED, conf.WIDTH/2, conf.HEIGHT/2, "center")
+            draw_text(self, "Press P to unpause game", self.title_font, 24, conf.WHITE, conf.WIDTH, 0, "ne")
+            draw_text(self, "Press M to toggle mute", self.title_font, 24, conf.WHITE, conf.WIDTH, 24, "ne")
+            draw_text(self, "Press R to restart game", self.title_font, 24, conf.WHITE, conf.WIDTH, 48, "ne")
         else:
-            draw_text(self, "Press P to pause game", self.title_font, 24, WHITE, WIDTH, 0, align = "ne")
+            draw_text(self, "Press P to pause game", self.title_font, 24, conf.WHITE, conf.WIDTH, 0, "ne")
         if len(self.mobs) == 0:
-            draw_text(self, "No more enemies", self.title_font, 64, GREEN2, WIDTH/2, HEIGHT/4, align = "center")
-            draw_text(self, "Press Space to go to next level", self.title_font, 64, WHITE, WIDTH/2, HEIGHT/4+70, align = "center")
+            draw_text(self, "No more enemies", self.title_font, 64, conf.GREEN2, conf.WIDTH/2, conf.HEIGHT/4, "center")
+            draw_text(self, "Press Space to go to next level", self.title_font, 64, conf.WHITE, conf.WIDTH/2, conf.HEIGHT/4+70, "center")
         pg.display.flip()
 
 
@@ -159,15 +164,16 @@ class Game:
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:
                     self.quit()
-                if event.key == pg.K_p:
-                    self.paused = not self.paused
             elif event.type == pg.KEYUP:
                 if event.key == pg.K_m:
                     self.soundManager.toggle_mute()
                 if event.key == pg.K_r:
                     self.new()
                     self.run()
+                if event.key == pg.K_p:
+                    self.paused = not self.paused
                 if event.key == pg.K_SPACE and len(self.mobs) == 0:
+                    self.add_points(self.player.points_current_level)
                     if self.map_progress < len(self.maps) - 1:
                         self.map_progress += 1
                     else:
@@ -180,3 +186,6 @@ class Game:
 
     def show_go_screen(self):
         pass
+
+    def add_points(self, pointsToAdd):
+        self.points += pointsToAdd
