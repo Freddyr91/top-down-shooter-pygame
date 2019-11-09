@@ -32,6 +32,8 @@ WALL_TILE = '1'
 PLAYER_TILE = 'P'
 HEALTH_TILE = 'H'
 MOB_TILE = 'M'
+MG_TILE = 'X'
+SW_TILE = 'S'
 
 #game properties
 PLAYER_LAYER = 5
@@ -63,6 +65,7 @@ MOB_KNOCKBACK = 20
 MOB_AVOID_RADIUS = 50
 MOB_DETECT_RADIUS = 400
 MOB_ROT_VEC = [vec(0,0), vec(0,1), vec(1,0), vec(1,1)]
+MOB_DAMAGE_DELAY = 0.5
 
 WALL_IMG = "tile_98.png"
 FLOOR_IMGS = []
@@ -79,7 +82,9 @@ for i in range(0, 3):
     SPLAT_IMGS.append("splat_0" + str(i) + ".png")
 
 # items
-ITEM_IMGS = {'health': 'health.png'}
+ITEM_IMGS = {'health': 'health.png',
+             'mg_pickup': 'machinegun_pickup.png',
+             'sw_pickup': 'shockwave_pickup.png'}
 ITEM_HEALTH_AMOUNT = 20
 ITEM_BOB_RANGE = 16
 ITEM_BOB_SPEED = 0.4
@@ -95,26 +100,56 @@ WEAPON_SOUNDS = {}
 WEAPON_SOUNDS['gun'] = ['shoot1.wav', 'shoot2.wav', 'shoot3.wav', 'shoot4.wav',
                         'shoot5.wav', 'shoot6.wav', 'shoot7.wav', 'shoot8.wav']
 EFFECTS_SOUNDS = {'level_start': 'weird.wav',
-                  'health_up': 'pickup.wav'}
+                  'health_up': 'pickup.wav',
+                  'mg_pickup': 'space.wav',
+                  'sw_pickup': 'space.wav'}
 
 
 # Gun settings
-BULLET_IMGS = ["bullet.png"]
+#BULLET_IMGS = ['bullet.png', 'shockwave.png']
+BULLET_IMGS = {'pistol': 'bullet.png',
+               'shotgun': 'bullet.png',
+               'machinegun': 'bullet.png',
+               'shockwave': 'shockwave.png'} 
+
 GUN_SPREAD = 3
 SHOTGUN_SPREAD = 0
 WEAPONS = {}
-WEAPONS['pistol'] = {'speed': 500,
+
+
+WEAPONS['pistol'] = {'ammo': -1,
+                     'speed': 500,
                      'lifetime': 1000,
                      'rate': 250,
                      'kickback': 200,
                      'spread': 5,
                      'damage': 20,
-                     'size': 'lg',
-                     'count': 1}
-WEAPONS['shotgun'] = {'speed': 400,
+                     'count': 1,
+                     'solid': True}
+WEAPONS['machinegun'] = {'ammo': 200,
+                         'speed': 500,
+                         'lifetime': 1000,
+                         'rate': 50,
+                         'kickback': 200,
+                         'spread': 5,
+                         'damage': 10,
+                         'count': 1,
+                         'solid': True}
+WEAPONS['shotgun'] = {'ammo': 12,
+                      'speed': 400,
                       'lifetime': 500,
                       'rate': 900,
                       'kickback': 300,
-                      'spread': 5,
+                      'spread': 40,
                       'damage': 2,
-                      'count': 15}
+                      'count': 15,
+                      'solid': True}
+WEAPONS['shockwave'] = {'ammo': 4,
+                        'speed': 300,
+                        'lifetime': 1500,
+                        'rate': 1500,
+                        'kickback': 300,
+                        'spread': 0,
+                        'damage': 40,
+                        'count': 1,
+                        'solid': False}

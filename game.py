@@ -1,3 +1,4 @@
+from os import path
 import settings as conf
 import environment
 from camera import *
@@ -5,6 +6,7 @@ from item import *
 from player import *
 from mob import Mob
 from soundManager import SoundManager
+import utils
 
 class Game:
     def __init__(self):
@@ -37,27 +39,27 @@ class Game:
         self.dim_screen_img = pg.Surface(self.screen.get_size()).convert_alpha()
         self.dim_screen_img.fill((0,0,0,120))
 
-        self.maps = load_maps(self.asset_folder)
-        self.player_imgs = load_images_in_folder(conf.PLAYER_IMGS, img_folder)
+        self.maps = utils.load_maps(self.asset_folder)
+        self.player_imgs = utils.load_images_in_folder(conf.PLAYER_IMGS, img_folder)
         for i in range (0, len(self.player_imgs)):
             self.player_imgs[i] = pg.transform.scale(self.player_imgs[i], (conf.TILESIZE, conf.TILESIZE))
-        self.wall_img = load_images_in_folder(conf.WALL_IMG, img_folder)
-        self.bullet_imgs = load_images_in_folder(conf.BULLET_IMGS, img_folder)
-        self.noise_imgs = load_images_in_folder(conf.NOISE_IMGS, img_folder)
-        self.floor_imgs = load_images_in_folder(conf.FLOOR_IMGS, img_folder)
-        self.flash_imgs = load_images_in_folder(conf.BULLET_FLASH_IMGS, img_folder)
-        self.item_imgs = load_images_in_folder(conf.ITEM_IMGS, img_folder)
-        self.splat_imgs = load_images_in_folder(conf.SPLAT_IMGS, img_folder)
+        self.wall_img = utils.load_images_in_folder(conf.WALL_IMG, img_folder)
+        self.bullet_imgs = utils.load_images_in_folder(conf.BULLET_IMGS, img_folder)
+        self.noise_imgs = utils.load_images_in_folder(conf.NOISE_IMGS, img_folder)
+        self.floor_imgs = utils.load_images_in_folder(conf.FLOOR_IMGS, img_folder)
+        self.flash_imgs = utils.load_images_in_folder(conf.BULLET_FLASH_IMGS, img_folder)
+        self.item_imgs = utils.load_images_in_folder(conf.ITEM_IMGS, img_folder)
+        self.splat_imgs = utils.load_images_in_folder(conf.SPLAT_IMGS, img_folder)
         # Sound
         pg.mixer.music.load(path.join(music_folder, conf.BG_MUSIC))
-        self.effect_sounds = load_sounds_in_folder(conf.EFFECTS_SOUNDS, snd_folder)
-        self.weapon_sounds = load_sounds_in_folder(conf.WEAPON_SOUNDS, snd_folder)
-        self.enemy_sounds = load_sounds_in_folder(conf.ENEMY_SOUNDS, snd_folder)
+        self.effect_sounds = utils.load_sounds_in_folder(conf.EFFECTS_SOUNDS, snd_folder)
+        self.weapon_sounds = utils.load_sounds_in_folder(conf.WEAPON_SOUNDS, snd_folder)
+        self.enemy_sounds = utils.load_sounds_in_folder(conf.ENEMY_SOUNDS, snd_folder)
         for s in self.enemy_sounds:
             s.set_volume(.2)
-        self.player_hit_sounds = load_sounds_in_folder(conf.PLAYER_HIT_SOUNDS, snd_folder)
+        self.player_hit_sounds = utils.load_sounds_in_folder(conf.PLAYER_HIT_SOUNDS, snd_folder)
         ## TODO - Find other sound for this
-        self.enemy_hit_sounds = load_sounds_in_folder(conf.ENEMY_SOUNDS, snd_folder)
+        self.enemy_hit_sounds = utils.load_sounds_in_folder(conf.ENEMY_SOUNDS, snd_folder)
         for s in self.enemy_hit_sounds:
             s.set_volume(.2)
 
@@ -78,6 +80,10 @@ class Game:
                     self.player = Player(self, conf.vec(col, row))
                 elif tile == conf.HEALTH_TILE:
                     Item(self, conf.vec(col, row), "health")
+                elif tile == conf.MG_TILE:
+                    Item(self, conf.vec(col, row), "mg_pickup")
+                elif tile == conf.SW_TILE:
+                    Item(self, conf.vec(col, row), "sw_pickup")
         for row, tiles in enumerate(self.maps[self.map_progress].data):
             for col, tile in enumerate(tiles):
                 if tile == conf.MOB_TILE:
@@ -108,30 +114,6 @@ class Game:
         # update portion of the game loop
         self.all_sprites.update()
         self.camera.update(self.player)
-        # player picks up health
-        hits = pg.sprite.spritecollide(self.player, self.items, False, collide_hit_rect)
-        for hit in hits:
-            if hit.type == "health" and self.player.health < conf.PLAYER_HEALTH:
-                hit.kill()
-                self.soundManager.play_sound_effect(self.effect_sounds['health_up'])
-                self.player.add_health(conf.ITEM_HEALTH_AMOUNT)
-        # mob hits
-        hits = pg.sprite.spritecollide(self.player, self.mobs, False, collide_hit_rect)
-        for hit in hits:
-            if conf.random() < 0.7:
-                self.soundManager.play_sound_effect(conf.choice(self.player_hit_sounds))
-
-            self.player.health -= conf.MOB_DAMAGE
-            hit.vel = conf.vec(0,0)
-            if self.player.health <= 0:
-                self.playing = False
-        if hits:
-            self.player.pos += conf.vec(conf.MOB_KNOCKBACK, 0).rotate(-hits[0].rot)
-        # bullets hit mob
-        hits = pg.sprite.groupcollide(self.mobs, self.bullets, False, True)
-        for hit in hits:
-            hit.health -= conf.WEAPONS[self.player.weapon]['damage'] * len(hits[hit])
-            hit.vel = conf.vec(0,0)
 
     def draw(self):
         self.screen.fill(conf.BGCOLOR)
@@ -139,20 +121,22 @@ class Game:
             self.screen.blit(sprite.image, self.camera.apply(sprite))
 
         #HUD
-        draw_player_health(self.screen, 10, 10, self.player.health)
-        draw_text(self, "FPS " + "{:.2f}".format(self.clock.get_fps()), self.title_font, 24, conf.WHITE, 120, 10, align = "nw")
-        draw_text(self, "Points " + "{}".format(self.points + self.player.points_current_level), self.title_font, 24, conf.WHITE, 10, conf.HEIGHT-10, align = "sw")
+        utils.draw_player_health(self.screen, 10, 10, self.player.health)
+        utils.draw_text(self, "FPS " + "{:.2f}".format(self.clock.get_fps()), self.title_font, 24, conf.WHITE, 120, 10, align = "nw")
+        utils.draw_text(self, "Points " + "{}".format(self.points + self.player.points_current_level), self.title_font, 24, conf.WHITE, 10, conf.HEIGHT-10, align = "sw")
+        if (self.player.secondary_weapon_bullets > 0):
+            utils.draw_text(self, "Secondary weapon -{}- ammo -{}-".format(self.player.secondary_weapon, self.player.secondary_weapon_bullets), self.title_font, 24, conf.WHITE, 10, conf.HEIGHT-34, align = "sw")
         if self.paused:
             self.screen.blit(self.dim_screen_img, (0,0))
-            draw_text(self, "Paused", self.title_font, 105, conf.RED, conf.WIDTH/2, conf.HEIGHT/2, "center")
-            draw_text(self, "Press P to unpause game", self.title_font, 24, conf.WHITE, conf.WIDTH, 0, "ne")
-            draw_text(self, "Press M to toggle mute", self.title_font, 24, conf.WHITE, conf.WIDTH, 24, "ne")
-            draw_text(self, "Press R to restart game", self.title_font, 24, conf.WHITE, conf.WIDTH, 48, "ne")
+            utils.draw_text(self, "Paused", self.title_font, 105, conf.RED, conf.WIDTH/2, conf.HEIGHT/2, "center")
+            utils.draw_text(self, "Press P to unpause game", self.title_font, 24, conf.WHITE, conf.WIDTH, 0, "ne")
+            utils.draw_text(self, "Press M to toggle mute", self.title_font, 24, conf.WHITE, conf.WIDTH, 24, "ne")
+            utils.draw_text(self, "Press R to restart game", self.title_font, 24, conf.WHITE, conf.WIDTH, 48, "ne")
         else:
-            draw_text(self, "Press P to pause game", self.title_font, 24, conf.WHITE, conf.WIDTH, 0, "ne")
+            utils.draw_text(self, "Press P to pause game", self.title_font, 24, conf.WHITE, conf.WIDTH, 0, "ne")
         if len(self.mobs) == 0:
-            draw_text(self, "No more enemies", self.title_font, 64, conf.GREEN2, conf.WIDTH/2, conf.HEIGHT/4, "center")
-            draw_text(self, "Press Space to go to next level", self.title_font, 64, conf.WHITE, conf.WIDTH/2, conf.HEIGHT/4+70, "center")
+            utils.draw_text(self, "No more enemies", self.title_font, 64, conf.GREEN2, conf.WIDTH/2, conf.HEIGHT/4, "center")
+            utils.draw_text(self, "Press Space to go to next level", self.title_font, 64, conf.WHITE, conf.WIDTH/2, conf.HEIGHT/4+70, "center")
         pg.display.flip()
 
 

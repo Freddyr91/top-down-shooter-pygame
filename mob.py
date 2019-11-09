@@ -75,6 +75,13 @@ class Mob(conf.pg.sprite.Sprite):
             self.hit_rect.centery = self.pos.y
             utils.collide_with_walls(self, self.game.walls, 'y')
             self.rect.center = self.hit_rect.center
+        bullet_hits = conf.pg.sprite.spritecollide(self, self.game.bullets, False, utils.collide_hit_rect)
+        for bullet in bullet_hits:
+            self.health -= conf.WEAPONS[bullet.type]['damage']
+            self.vel = conf.vec(0,0)
+            if (conf.WEAPONS[bullet.type]['solid']):
+                bullet.kill()
+
         if self.health <= 0:
             self.game.soundManager.play_sound_effect(conf.choice(self.game.enemy_hit_sounds))
             effects.Splat(self.game, self.pos)

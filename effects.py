@@ -1,4 +1,5 @@
 import settings as conf
+import utils
 
 class Bullet(conf.pg.sprite.Sprite):
     def __init__(self, game, pos, dir, type):
@@ -7,7 +8,8 @@ class Bullet(conf.pg.sprite.Sprite):
         self.groups = game.all_sprites, game.bullets
         conf.pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = conf.choice(game.bullet_imgs)
+        self.image = game.bullet_imgs[type]
+        self.image_copy = self.image.copy()
         self.rect = self.image.get_rect()
         self.pos = pos
         self.rect.center = pos
@@ -16,11 +18,12 @@ class Bullet(conf.pg.sprite.Sprite):
         self.rot = dir.angle_to(conf.vec(1,0))
 
     def update(self):
-        self.image = conf.pg.transform.rotate(conf.choice(self.game.bullet_imgs), self.rot)
+        self.image = conf.pg.transform.rotate(self.image_copy, self.rot)
         self.pos += self.vel * self.game.dt
         self.rect.center = self.pos
         if conf.pg.sprite.spritecollideany(self, self.game.walls):
-            self.kill()
+            if (conf.WEAPONS[self.type]['solid']):
+                self.kill()
         if conf.pg.time.get_ticks() - self.spawn_time > conf.WEAPONS[self.type]['lifetime']:
             self.kill()
 
