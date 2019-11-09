@@ -1,12 +1,15 @@
 import settings as conf
 
 class Camera:
-    def __init__(self, width, height):
+    def __init__(self, game, width, height):
+        self.game = game
         self.camera = conf.pg.Rect(0, 0, width, height)
         self.width = width
         self.height = height
 
     def apply(self, entity):
+        if (entity == self.game.background):
+            return entity.rect.move(self.camera.x*0.5, self.camera.y*0.5) # parallax scrolling on background
         return entity.rect.move(self.camera.topleft)
 
     def mouseadjustment(self, mouse):

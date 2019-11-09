@@ -3,7 +3,7 @@ import settings as conf
 
 class Item(conf.pg.sprite.Sprite):
     def __init__(self, game, pos, itemType):
-        self._layer = conf.PLAYER_LAYER
+        self._layer = conf.EFFECT_LAYER
         self.groups = game.all_sprites, game.items
         conf.pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game

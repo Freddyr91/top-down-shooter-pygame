@@ -84,16 +84,11 @@ class Player(pg.sprite.Sprite):
                 hit.kill()
                 self.game.soundManager.play_sound_effect(self.game.effect_sounds['health_up'])
                 self.add_health(conf.ITEM_HEALTH_AMOUNT)
-            if (hit.type == 'mg_pickup'):
+            if (hit.type in conf.WEAPONS):
                 hit.kill()
-                self.game.soundManager.play_sound_effect(self.game.effect_sounds['mg_pickup'])
-                self.secondary_weapon = 'machinegun'
-                self.secondary_weapon_bullets = conf.WEAPONS['machinegun']['ammo']
-            if (hit.type == 'sw_pickup'):
-                hit.kill()
-                self.game.soundManager.play_sound_effect(self.game.effect_sounds['sw_pickup'])
-                self.secondary_weapon = 'shockwave'
-                self.secondary_weapon_bullets = conf.WEAPONS['shockwave']['ammo']
+                self.game.soundManager.play_sound_effect(self.game.effect_sounds[hit.type])
+                self.secondary_weapon = hit.type
+                self.secondary_weapon_bullets = conf.WEAPONS[hit.type]['ammo']
 
     def shoot(self, weapon):
         now = pg.time.get_ticks()
@@ -105,8 +100,8 @@ class Player(pg.sprite.Sprite):
             for i in range(conf.WEAPONS[weapon]['count']):
                 spread = uniform(-conf.WEAPONS[weapon]['spread'], conf.WEAPONS[weapon]['spread'])
                 effects.Bullet(self.game, pos, dir.rotate(spread), weapon)
-                if (weapon != self.main_weapon):
-                    self.secondary_weapon_bullets -= 1
+            if (weapon != self.main_weapon):
+                self.secondary_weapon_bullets -= 1
             self.game.soundManager.play_sound_effect(choice(self.game.weapon_sounds['gun']))
             effects.Flash(self.game, pos, self.rot)
 

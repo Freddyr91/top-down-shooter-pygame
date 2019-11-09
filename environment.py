@@ -11,13 +11,13 @@ class Wall(conf.pg.sprite.Sprite):
         self.pos = pos
         self.rect.center = pos * conf.TILESIZE
 
-class Floor(conf.pg.sprite.Sprite):
+class Background(conf.pg.sprite.Sprite):
     def __init__(self, game, pos):
-        self._layer = conf.FLOOR_LAYER
+        self._layer = conf.BG_LAYER
         self.groups = game.all_sprites
         conf.pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = conf.choice(game.floor_imgs)
+        self.image = self.game.background_image
         self.rect = self.image.get_rect()
         self.pos = pos
-        self.rect.topleft = pos * conf.TILESIZE
+        self.rect.center = pos * conf.TILESIZE

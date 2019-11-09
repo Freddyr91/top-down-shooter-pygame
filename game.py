@@ -1,15 +1,18 @@
 from os import path
+import pygame as pg
 import settings as conf
-import environment
-from camera import *
-from item import *
-from player import *
+from environment import Background, Wall
+from camera import Camera
+from item import Item
+from player import Player
 from mob import Mob
 from soundManager import SoundManager
 import utils
 
 class Game:
     def __init__(self):
+        conf.pg.init()
+        pg.display.set_caption(conf.TITLE)
         self.soundManager = SoundManager()
         # Full-screen test stuff
         #user32 = conf.ctypes.windll.user32
@@ -17,7 +20,6 @@ class Game:
         #print(screenSize)
         #size = (screenSize)
         #pg.display.set_mode((size) , pg.FULLSCREEN)
-        #pg.display.set_caption(conf.TITLE)
         #conf.WIDTH = screenSize[0]
         #conf.HEIGHT = screenSize[1]
         self.screen = conf.pg.display.set_mode((conf.WIDTH, conf.HEIGHT))
@@ -36,6 +38,7 @@ class Game:
         self.asset_folder = path.join(game_folder, 'assets')
 
         self.title_font = path.join(game_folder, conf.FONT)
+        self.background_image = utils.load_images_in_folder(conf.BACKGROUND_IMAGE, img_folder)
         self.dim_screen_img = pg.Surface(self.screen.get_size()).convert_alpha()
         self.dim_screen_img.fill((0,0,0,120))
 
@@ -46,7 +49,6 @@ class Game:
         self.wall_img = utils.load_images_in_folder(conf.WALL_IMG, img_folder)
         self.bullet_imgs = utils.load_images_in_folder(conf.BULLET_IMGS, img_folder)
         self.noise_imgs = utils.load_images_in_folder(conf.NOISE_IMGS, img_folder)
-        self.floor_imgs = utils.load_images_in_folder(conf.FLOOR_IMGS, img_folder)
         self.flash_imgs = utils.load_images_in_folder(conf.BULLET_FLASH_IMGS, img_folder)
         self.item_imgs = utils.load_images_in_folder(conf.ITEM_IMGS, img_folder)
         self.splat_imgs = utils.load_images_in_folder(conf.SPLAT_IMGS, img_folder)
@@ -73,17 +75,18 @@ class Game:
         self.items = pg.sprite.Group()
         for row, tiles in enumerate(self.maps[self.map_progress].data):
             for col, tile in enumerate(tiles):
-                environment.Floor(self, conf.vec(col, row))
                 if tile == conf.WALL_TILE:
-                    environment.Wall(self, conf.vec(col, row))
+                    Wall(self, conf.vec(col, row))
                 elif tile == conf.PLAYER_TILE:
                     self.player = Player(self, conf.vec(col, row))
                 elif tile == conf.HEALTH_TILE:
                     Item(self, conf.vec(col, row), "health")
                 elif tile == conf.MG_TILE:
-                    Item(self, conf.vec(col, row), "mg_pickup")
+                    Item(self, conf.vec(col, row), "machinegun")
                 elif tile == conf.SW_TILE:
-                    Item(self, conf.vec(col, row), "sw_pickup")
+                    Item(self, conf.vec(col, row), "shockwave")
+                elif tile == conf.SG_TILE:
+                    Item(self, conf.vec(col, row), "shotgun")
         for row, tiles in enumerate(self.maps[self.map_progress].data):
             for col, tile in enumerate(tiles):
                 if tile == conf.MOB_TILE:
@@ -91,7 +94,8 @@ class Game:
 
         self.paused = False
 
-        self.camera = Camera(self.maps[self.map_progress].width, self.maps[self.map_progress].height)
+        self.camera = Camera(self, self.maps[self.map_progress].width, self.maps[self.map_progress].height)
+        self.background = Background(self, conf.vec(0,0))
         self.soundManager.play_sound_effect(self.effect_sounds['level_start'])
 
     def run(self):
@@ -122,18 +126,18 @@ class Game:
 
         #HUD
         utils.draw_player_health(self.screen, 10, 10, self.player.health)
-        utils.draw_text(self, "FPS " + "{:.2f}".format(self.clock.get_fps()), self.title_font, 24, conf.WHITE, 120, 10, align = "nw")
-        utils.draw_text(self, "Points " + "{}".format(self.points + self.player.points_current_level), self.title_font, 24, conf.WHITE, 10, conf.HEIGHT-10, align = "sw")
+        utils.draw_text(self, "FPS " + "{:.2f}".format(self.clock.get_fps()), self.title_font, conf.DEFAULT_FONT_SIZE, conf.WHITE, 120, 10, align = "nw")
+        utils.draw_text(self, "Points " + "{}".format(self.points + self.player.points_current_level), self.title_font, conf.DEFAULT_FONT_SIZE, conf.WHITE, 10, conf.HEIGHT-10, align = "sw")
         if (self.player.secondary_weapon_bullets > 0):
-            utils.draw_text(self, "Secondary weapon -{}- ammo -{}-".format(self.player.secondary_weapon, self.player.secondary_weapon_bullets), self.title_font, 24, conf.WHITE, 10, conf.HEIGHT-34, align = "sw")
+            utils.draw_text(self, "Secondary weapon: {} | ammo:{: 3d}".format(self.player.secondary_weapon, self.player.secondary_weapon_bullets), self.title_font, 24, conf.WHITE, conf.WIDTH-10, conf.HEIGHT-10, align = "se")
         if self.paused:
             self.screen.blit(self.dim_screen_img, (0,0))
             utils.draw_text(self, "Paused", self.title_font, 105, conf.RED, conf.WIDTH/2, conf.HEIGHT/2, "center")
-            utils.draw_text(self, "Press P to unpause game", self.title_font, 24, conf.WHITE, conf.WIDTH, 0, "ne")
-            utils.draw_text(self, "Press M to toggle mute", self.title_font, 24, conf.WHITE, conf.WIDTH, 24, "ne")
-            utils.draw_text(self, "Press R to restart game", self.title_font, 24, conf.WHITE, conf.WIDTH, 48, "ne")
+            utils.draw_text(self, "Press P to unpause game", self.title_font, conf.DEFAULT_FONT_SIZE, conf.WHITE, conf.WIDTH, 0, "ne")
+            utils.draw_text(self, "Press M to toggle mute", self.title_font, conf.DEFAULT_FONT_SIZE, conf.WHITE, conf.WIDTH, 24, "ne")
+            utils.draw_text(self, "Press R to restart game", self.title_font, conf.DEFAULT_FONT_SIZE, conf.WHITE, conf.WIDTH, 48, "ne")
         else:
-            utils.draw_text(self, "Press P to pause game", self.title_font, 24, conf.WHITE, conf.WIDTH, 0, "ne")
+            utils.draw_text(self, "Press P to pause game", self.title_font, conf.DEFAULT_FONT_SIZE, conf.WHITE, conf.WIDTH-10, 10, "ne")
         if len(self.mobs) == 0:
             utils.draw_text(self, "No more enemies", self.title_font, 64, conf.GREEN2, conf.WIDTH/2, conf.HEIGHT/4, "center")
             utils.draw_text(self, "Press Space to go to next level", self.title_font, 64, conf.WHITE, conf.WIDTH/2, conf.HEIGHT/4+70, "center")
