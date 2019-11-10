@@ -7,6 +7,8 @@ class SoundManager():
 
     def play_sound_effect(self, sound):
         if not self.muted:
+            if (sound.get_num_channels() > 2):
+                sound.stop()
             sound.play()
 
     def play_music(self):

@@ -11,9 +11,9 @@ import utils
 
 class Game:
     def __init__(self):
+        self.soundManager = SoundManager()
         conf.pg.init()
         pg.display.set_caption(conf.TITLE)
-        self.soundManager = SoundManager()
         # Full-screen test stuff
         #user32 = conf.ctypes.windll.user32
         #screenSize =  user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
@@ -29,6 +29,8 @@ class Game:
         pg.mouse.set_cursor(*pg.cursors.broken_x)
         self.map_progress = 0
         self.points = 0
+        self.player_health = 0
+        self.seed = conf.random.randint(42,69)
 
     def load_data(self):
         game_folder = path.dirname('__file__')
@@ -68,6 +70,7 @@ class Game:
 
     def new(self):
         # initialize all variables and do all the setup for a new game
+        conf.random.seed(self.seed)
         self.all_sprites = pg.sprite.LayeredUpdates()
         self.walls = pg.sprite.Group()
         self.mobs = pg.sprite.Group()
@@ -79,14 +82,16 @@ class Game:
                     Wall(self, conf.vec(col, row))
                 elif tile == conf.PLAYER_TILE:
                     self.player = Player(self, conf.vec(col, row))
+                    if (self.player_health != 0):
+                        self.player.health = self.player_health
                 elif tile == conf.HEALTH_TILE:
-                    Item(self, conf.vec(col, row), "health")
+                    Item(self, conf.vec(col, row), 'health')
                 elif tile == conf.MG_TILE:
-                    Item(self, conf.vec(col, row), "machinegun")
+                    Item(self, conf.vec(col, row), 'machinegun')
                 elif tile == conf.SW_TILE:
-                    Item(self, conf.vec(col, row), "shockwave")
+                    Item(self, conf.vec(col, row), 'shockwave')
                 elif tile == conf.SG_TILE:
-                    Item(self, conf.vec(col, row), "shotgun")
+                    Item(self, conf.vec(col, row), 'shotgun')
         for row, tiles in enumerate(self.maps[self.map_progress].data):
             for col, tile in enumerate(tiles):
                 if tile == conf.MOB_TILE:
@@ -95,7 +100,8 @@ class Game:
         self.paused = False
 
         self.camera = Camera(self, self.maps[self.map_progress].width, self.maps[self.map_progress].height)
-        self.background = Background(self, conf.vec(0,0))
+        self.background = Background(self, conf.vec(self.maps[self.map_progress].width/4, self.maps[self.map_progress].height/4))
+        print(len(self.all_sprites))
         self.soundManager.play_sound_effect(self.effect_sounds['level_start'])
 
     def run(self):
@@ -126,21 +132,21 @@ class Game:
 
         #HUD
         utils.draw_player_health(self.screen, 10, 10, self.player.health)
-        utils.draw_text(self, "FPS " + "{:.2f}".format(self.clock.get_fps()), self.title_font, conf.DEFAULT_FONT_SIZE, conf.WHITE, 120, 10, align = "nw")
-        utils.draw_text(self, "Points " + "{}".format(self.points + self.player.points_current_level), self.title_font, conf.DEFAULT_FONT_SIZE, conf.WHITE, 10, conf.HEIGHT-10, align = "sw")
+        utils.draw_text(self, 'FPS ' + '{:.2f}'.format(self.clock.get_fps()), self.title_font, conf.DEFAULT_FONT_SIZE, conf.WHITE, 120, 10, align = 'nw')
+        utils.draw_text(self, 'Points ' + '{}'.format(self.points + self.player.points_current_level), self.title_font, conf.DEFAULT_FONT_SIZE, conf.WHITE, 10, conf.HEIGHT-10, align = 'sw')
         if (self.player.secondary_weapon_bullets > 0):
-            utils.draw_text(self, "Secondary weapon: {} | ammo:{: 3d}".format(self.player.secondary_weapon, self.player.secondary_weapon_bullets), self.title_font, 24, conf.WHITE, conf.WIDTH-10, conf.HEIGHT-10, align = "se")
+            utils.draw_text(self, 'Secondary weapon: {} | ammo:{: 3d}'.format(self.player.secondary_weapon, self.player.secondary_weapon_bullets), self.title_font, 24, conf.WHITE, conf.WIDTH-10, conf.HEIGHT-10, align = 'se')
         if self.paused:
             self.screen.blit(self.dim_screen_img, (0,0))
-            utils.draw_text(self, "Paused", self.title_font, 105, conf.RED, conf.WIDTH/2, conf.HEIGHT/2, "center")
-            utils.draw_text(self, "Press P to unpause game", self.title_font, conf.DEFAULT_FONT_SIZE, conf.WHITE, conf.WIDTH, 0, "ne")
-            utils.draw_text(self, "Press M to toggle mute", self.title_font, conf.DEFAULT_FONT_SIZE, conf.WHITE, conf.WIDTH, 24, "ne")
-            utils.draw_text(self, "Press R to restart game", self.title_font, conf.DEFAULT_FONT_SIZE, conf.WHITE, conf.WIDTH, 48, "ne")
+            utils.draw_text(self, 'Paused', self.title_font, 105, conf.RED, conf.WIDTH/2, conf.HEIGHT/2, 'center')
+            utils.draw_text(self, 'Press P to unpause game', self.title_font, conf.DEFAULT_FONT_SIZE, conf.WHITE, conf.WIDTH, 0, 'ne')
+            utils.draw_text(self, 'Press M to toggle mute', self.title_font, conf.DEFAULT_FONT_SIZE, conf.WHITE, conf.WIDTH, 24, 'ne')
+            utils.draw_text(self, 'Press R to restart game', self.title_font, conf.DEFAULT_FONT_SIZE, conf.WHITE, conf.WIDTH, 48, 'ne')
         else:
-            utils.draw_text(self, "Press P to pause game", self.title_font, conf.DEFAULT_FONT_SIZE, conf.WHITE, conf.WIDTH-10, 10, "ne")
+            utils.draw_text(self, 'Press P to pause game', self.title_font, conf.DEFAULT_FONT_SIZE, conf.WHITE, conf.WIDTH-10, 10, 'ne')
         if len(self.mobs) == 0:
-            utils.draw_text(self, "No more enemies", self.title_font, 64, conf.GREEN2, conf.WIDTH/2, conf.HEIGHT/4, "center")
-            utils.draw_text(self, "Press Space to go to next level", self.title_font, 64, conf.WHITE, conf.WIDTH/2, conf.HEIGHT/4+70, "center")
+            utils.draw_text(self, 'No more enemies', self.title_font, 64, conf.GREEN2, conf.WIDTH/2, conf.HEIGHT/4, 'center')
+            utils.draw_text(self, 'Press Space to go to next level', self.title_font, 64, conf.WHITE, conf.WIDTH/2, conf.HEIGHT/4+70, 'center')
         pg.display.flip()
 
 
@@ -162,6 +168,7 @@ class Game:
                     self.paused = not self.paused
                 if event.key == pg.K_SPACE and len(self.mobs) == 0:
                     self.add_points(self.player.points_current_level)
+                    self.player_health = self.player.health
                     if self.map_progress < len(self.maps) - 1:
                         self.map_progress += 1
                     else:

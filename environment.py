@@ -20,4 +20,4 @@ class Background(conf.pg.sprite.Sprite):
         self.image = self.game.background_image
         self.rect = self.image.get_rect()
         self.pos = pos
-        self.rect.center = pos * conf.TILESIZE
+        self.rect.center = pos

@@ -124,3 +124,7 @@ def load_maps(folder):
     for map_filename in conf.MAPS:
         maps.append(Map(path.join(folder, map_filename)))
     return maps
+
+def rotate_image(image, angle):
+    rot_image = conf.pg.transform.rotate(image, angle)
+    return rot_image

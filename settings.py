@@ -2,7 +2,7 @@ import sys
 from pygame.locals import *
 import numpy as np
 import random
-from random import choice, randint, random, uniform
+import random
 from os import path
 import pygame as pg
 import ctypes
@@ -70,16 +70,16 @@ MOB_DETECT_RADIUS = 400
 MOB_ROT_VEC = [vec(0,0), vec(0,1), vec(1,0), vec(1,1)]
 MOB_DAMAGE_DELAY = 0.5
 
-WALL_IMG = "tile_98.png"
+WALL_IMG = 'tile_98.png'
 
 #effects
 BULLET_FLASH_IMGS = []
 for i in range(0, 1):
-    BULLET_FLASH_IMGS.append("effect_0" + str(i) + ".png")
+    BULLET_FLASH_IMGS.append('effect_0' + str(i) + '.png')
 BULLET_FLASH_DUR = 40
 SPLAT_IMGS = []
 for i in range(0, 3):
-    SPLAT_IMGS.append("splat_0" + str(i) + ".png")
+    SPLAT_IMGS.append('splat_0' + str(i) + '.png')
 
 # items
 ITEM_IMGS = {'health': 'health.png',
@@ -93,10 +93,10 @@ ITEM_BOB_SPEED = 0.4
 BG_MUSIC = 'through_space.ogg'
 ENEMY_SOUNDS = []
 for i in range(0,4):
-    ENEMY_SOUNDS.append("noise" + str(i) + ".wav")
+    ENEMY_SOUNDS.append('noise' + str(i) + '.wav')
 PLAYER_HIT_SOUNDS = []
 for i in range(0,4):
-    PLAYER_HIT_SOUNDS.append("hit" + str(i) + ".wav")
+    PLAYER_HIT_SOUNDS.append('hit' + str(i) + '.wav')
 WEAPON_SOUNDS = {}
 WEAPON_SOUNDS['gun'] = ['shoot1.wav', 'shoot2.wav', 'shoot3.wav', 'shoot4.wav',
                         'shoot5.wav', 'shoot6.wav', 'shoot7.wav', 'shoot8.wav']
@@ -126,7 +126,7 @@ WEAPONS['pistol'] = {'ammo': -1,
                      'kickback': 200,
                      'spread': 5,
                      'damage': 20,
-                     'count': 1,
+                     'bullet_count': 1,
                      'solid': True}
 WEAPONS['machinegun'] = {'ammo': 200,
                          'speed': 500,
@@ -135,16 +135,16 @@ WEAPONS['machinegun'] = {'ammo': 200,
                          'kickback': 400,
                          'spread': 5,
                          'damage': 10,
-                         'count': 1,
+                         'bullet_count': 1,
                          'solid': True}
 WEAPONS['shotgun'] = {'ammo': 12,
-                      'speed': 400,
+                      'speed': 20,
                       'lifetime': 500,
                       'rate': 900,
                       'kickback': 600,
-                      'spread': 40,
+                      'spread': 20,
                       'damage': 2,
-                      'count': 15,
+                      'bullet_count': 42,
                       'solid': True}
 WEAPONS['shockwave'] = {'ammo': 4,
                         'speed': 300,
@@ -153,5 +153,5 @@ WEAPONS['shockwave'] = {'ammo': 4,
                         'kickback': 300,
                         'spread': 0,
                         'damage': 7,
-                        'count': 1,
+                        'bullet_count': 1,
                         'solid': False}

@@ -1,8 +1,7 @@
-import effects
+from effects import Bullet, Flash
 import pygame as pg
 import settings as conf
 import utils
-from random import uniform, choice
 
 class Player(pg.sprite.Sprite):
     def __init__(self, game, pos):
@@ -20,8 +19,8 @@ class Player(pg.sprite.Sprite):
         self.last_shot = 0
         self.last_shot_shotgun = 0
         self.health = conf.PLAYER_HEALTH
-        self.main_weapon = "pistol"
-        self.secondary_weapon = ""
+        self.main_weapon = 'pistol'
+        self.secondary_weapon = ''
         self.secondary_weapon_bullets = 0
         self.points_current_level = 0
 
@@ -54,10 +53,10 @@ class Player(pg.sprite.Sprite):
         posBefore = self.pos
         self.pos += self.vel * self.game.dt
         if self.vel != conf.vec(0,0):
-            self.image = pg.transform.rotate(self.game.player_imgs[1], self.rot)
+            self.image = utils.rotate_image(self.game.player_imgs[1], self.rot)
         else:
-            self.image = pg.transform.rotate(self.game.player_imgs[0], self.rot)
-        self.rect = self.image.get_rect()
+            self.image = utils.rotate_image(self.game.player_imgs[0], self.rot)
+        self.rect = self.image.get_rect(center = self.rect.center)
         self.rect.center = self.pos
         self.hit_rect.centerx = self.pos.x
         utils.collide_with_walls(self, self.game.walls, 'x')
@@ -68,8 +67,8 @@ class Player(pg.sprite.Sprite):
         # mob hits
         hits = pg.sprite.spritecollide(self, self.game.mobs, False, utils.collide_hit_rect)
         for hit in hits:
-            if conf.random() < 0.7:
-                self.game.soundManager.play_sound_effect(conf.choice(self.game.player_hit_sounds))
+            if conf.random.random() < 0.7:
+                self.game.soundManager.play_sound_effect(conf.random.choice(self.game.player_hit_sounds))
             self.health -= conf.MOB_DAMAGE
             hit.vel = conf.vec(0,0)
             if self.health <= 0:
@@ -80,7 +79,7 @@ class Player(pg.sprite.Sprite):
         # player picks up health
         hits = pg.sprite.spritecollide(self, self.game.items, False, utils.collide_hit_rect)
         for hit in hits:
-            if hit.type == "health" and self.health < conf.PLAYER_HEALTH:
+            if hit.type == 'health' and self.health < conf.PLAYER_HEALTH:
                 hit.kill()
                 self.game.soundManager.play_sound_effect(self.game.effect_sounds['health_up'])
                 self.add_health(conf.ITEM_HEALTH_AMOUNT)
@@ -97,13 +96,14 @@ class Player(pg.sprite.Sprite):
             dir = conf.vec(1, 0).rotate(-self.rot)
             pos = self.pos + conf.BARREL_OFFSET.rotate(-self.rot)
             self.vel = conf.vec(-conf.WEAPONS[weapon]['kickback'], 0).rotate(-self.rot)
-            for i in range(conf.WEAPONS[weapon]['count']):
-                spread = uniform(-conf.WEAPONS[weapon]['spread'], conf.WEAPONS[weapon]['spread'])
-                effects.Bullet(self.game, pos, dir.rotate(spread), weapon)
+            spread_list = []
+            for i in range(conf.WEAPONS[weapon]['bullet_count']):
+                spread = conf.random.uniform(-conf.WEAPONS[weapon]['spread'], conf.WEAPONS[weapon]['spread'])   
+                Bullet(self.game, pos, dir.rotate(spread), weapon)
             if (weapon != self.main_weapon):
                 self.secondary_weapon_bullets -= 1
-            self.game.soundManager.play_sound_effect(choice(self.game.weapon_sounds['gun']))
-            effects.Flash(self.game, pos, self.rot)
+            self.game.soundManager.play_sound_effect(conf.random.choice(self.game.weapon_sounds['gun']))
+            Flash(self.game, pos, self.rot)
 
     def add_health(self, amount):
         self.health += amount

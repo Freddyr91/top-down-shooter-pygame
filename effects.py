@@ -10,15 +10,14 @@ class Bullet(conf.pg.sprite.Sprite):
         self.game = game
         self.image = game.bullet_imgs[type]
         self.image_copy = self.image.copy()
+        self.rot = dir.angle_to(conf.vec(1,0))
+        self.image = conf.pg.transform.rotate(self.image_copy, self.rot)
         self.rect = self.image.get_rect()
         self.pos = pos
         self.rect.center = pos
-        self.vel = dir * conf.WEAPONS[type]['speed']
+        self.vel = dir * conf.WEAPONS[type]['speed'] * conf.random.uniform(0.9, 1.1)
         self.spawn_time = conf.pg.time.get_ticks()
-        self.rot = dir.angle_to(conf.vec(1,0))
-
     def update(self):
-        self.image = conf.pg.transform.rotate(self.image_copy, self.rot)
         self.pos += self.vel * self.game.dt
         self.rect.center = self.pos
         if conf.pg.sprite.spritecollideany(self, self.game.walls):
@@ -33,12 +32,12 @@ class Splat(conf.pg.sprite.Sprite):
         self.groups = game.all_sprites
         conf.pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        img = conf.choice(game.splat_imgs)
+        img = conf.random.choice(game.splat_imgs)
         self.image = img
         self.rect = self.image.get_rect()
         self.pos = pos
         self.rect.center = pos
-        dir = conf.vec(conf.uniform(-1.0, 1.0), conf.uniform(-1.0, 1.0))
+        dir = conf.vec(conf.random.uniform(-1.0, 1.0), conf.random.uniform(-1.0, 1.0))
         self.rot = (dir.angle_to(conf.vec(1, 0)))
         self.image = conf.pg.transform.rotate(img, self.rot)
 
@@ -48,8 +47,8 @@ class Flash(conf.pg.sprite.Sprite):
         self.groups = game.all_sprites
         conf.pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        size = conf.randint(20, 50)
-        self.image = conf.pg.transform.scale(conf.choice(game.flash_imgs), (size * 2, size))
+        size = conf.random.randint(20, 50)
+        self.image = conf.pg.transform.scale(conf.random.choice(game.flash_imgs), (size * 2, size))
         self.image = conf.pg.transform.rotate(self.image, rot)
         self.rect = self.image.get_rect()
         self.pos = pos

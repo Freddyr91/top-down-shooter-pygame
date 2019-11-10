@@ -8,14 +8,14 @@ class Mob(conf.pg.sprite.Sprite):
         self.groups = game.all_sprites, game.mobs
         conf.pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.toughness = conf.uniform(0.9,1.2)
+        self.toughness = conf.random.uniform(0.9,1.2)
         self.mob_size = 'normal'
         if (not forceNormal):
-            self.mob_size = conf.choice(conf.MOB_SIZES)
+            self.mob_size = conf.random.choice(conf.MOB_SIZES)
             if self.mob_size == 'big':
-                self.toughness = conf.uniform(1.5,1.8)
+                self.toughness = conf.random.uniform(1.5,1.8)
             elif self.mob_size == 'small':
-                self.toughness = conf.uniform(0.3,0.6)
+                self.toughness = conf.random.uniform(0.3,0.6)
         self.select_mob_img()
         self.image_copy = self.image.copy()
         self.rect = self.image.get_rect()
@@ -39,13 +39,13 @@ class Mob(conf.pg.sprite.Sprite):
 
     def select_mob_img(self):
         #TODO clean this
-        image = conf.choice(self.game.noise_imgs)
+        image = conf.random.choice(self.game.noise_imgs)
         img_size = image.get_rect().size
 
         mob_size = round(conf.TILESIZE/2 * self.toughness)
 
-        x = conf.randint(0, img_size[0] - mob_size)
-        y = conf.randint(0, img_size[1] - mob_size)
+        x = conf.random.randint(0, img_size[0] - mob_size)
+        y = conf.random.randint(0, img_size[1] - mob_size)
 
         newimg = conf.pg.Surface((mob_size, mob_size)).convert_alpha()
         newimg.blit(image, (0, 0), (x,y, mob_size, mob_size))
@@ -56,8 +56,8 @@ class Mob(conf.pg.sprite.Sprite):
     def update(self):
         target_dist = self.target.pos - self.pos
         if target_dist.length_squared() < conf.MOB_DETECT_RADIUS**2:
-            if conf.random() < 0.001:
-                self.game.soundManager.play_sound_effect(conf.choice(self.game.enemy_sounds))
+            if conf.random.random() < 0.001:
+                self.game.soundManager.play_sound_effect(conf.random.choice(self.game.enemy_sounds))
 
             self.rot = (target_dist).angle_to(conf.vec(1, 0))
             ## TODO - Add rotation if needed
@@ -84,7 +84,7 @@ class Mob(conf.pg.sprite.Sprite):
                 bullet.kill()
 
         if self.health <= 0:
-            self.game.soundManager.play_sound_effect(conf.choice(self.game.enemy_hit_sounds))
+            self.game.soundManager.play_sound_effect(conf.random.choice(self.game.enemy_hit_sounds))
             effects.Splat(self.game, self.pos)
             if self.mob_size == 'big':
                 Mob(self.game, (self.pos-conf.vec(1,0))/conf.TILESIZE, True, self.rot)
