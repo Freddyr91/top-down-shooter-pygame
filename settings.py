@@ -108,16 +108,12 @@ EFFECTS_SOUNDS = {'level_start': 'weird.wav',
 
 
 # Gun settings
-#BULLET_IMGS = ['bullet.png', 'shockwave.png']
 BULLET_IMGS = {'pistol': 'bullet.png',
                'shotgun': 'bullet.png',
                'machinegun': 'bullet.png',
                'shockwave': 'shockwave.png'} 
 
-GUN_SPREAD = 3
-SHOTGUN_SPREAD = 0
-WEAPONS = {}
-
+WEAPONS = {} # Weapons dictionary
 
 WEAPONS['pistol'] = {'ammo': -1,
                      'speed': 500,
@@ -128,6 +124,7 @@ WEAPONS['pistol'] = {'ammo': -1,
                      'damage': 20,
                      'bullet_count': 1,
                      'solid': True}
+
 WEAPONS['machinegun'] = {'ammo': 200,
                          'speed': 500,
                          'lifetime': 1000,
@@ -137,6 +134,7 @@ WEAPONS['machinegun'] = {'ammo': 200,
                          'damage': 10,
                          'bullet_count': 1,
                          'solid': True}
+
 WEAPONS['shotgun'] = {'ammo': 12,
                       'speed': 20,
                       'lifetime': 500,
@@ -146,6 +144,7 @@ WEAPONS['shotgun'] = {'ammo': 12,
                       'damage': 2,
                       'bullet_count': 42,
                       'solid': True}
+
 WEAPONS['shockwave'] = {'ammo': 4,
                         'speed': 300,
                         'lifetime': 1500,

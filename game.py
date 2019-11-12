@@ -30,7 +30,7 @@ class Game:
         self.map_progress = 0
         self.points = 0
         self.player_health = 0
-        self.seed = conf.random.randint(42,69)
+        self.seed = conf.random.randint(42, 69)
 
     def load_data(self):
         game_folder = path.dirname('__file__')
@@ -42,11 +42,11 @@ class Game:
         self.title_font = path.join(game_folder, conf.FONT)
         self.background_image = utils.load_images_in_folder(conf.BACKGROUND_IMAGE, img_folder)
         self.dim_screen_img = pg.Surface(self.screen.get_size()).convert_alpha()
-        self.dim_screen_img.fill((0,0,0,120))
+        self.dim_screen_img.fill((0, 0, 0, 120))
 
         self.maps = utils.load_maps(self.asset_folder)
         self.player_imgs = utils.load_images_in_folder(conf.PLAYER_IMGS, img_folder)
-        for i in range (0, len(self.player_imgs)):
+        for i in range(0, len(self.player_imgs)):
             self.player_imgs[i] = pg.transform.scale(self.player_imgs[i], (conf.TILESIZE, conf.TILESIZE))
         self.wall_img = utils.load_images_in_folder(conf.WALL_IMG, img_folder)
         self.bullet_imgs = utils.load_images_in_folder(conf.BULLET_IMGS, img_folder)
@@ -62,11 +62,10 @@ class Game:
         for s in self.enemy_sounds:
             s.set_volume(.2)
         self.player_hit_sounds = utils.load_sounds_in_folder(conf.PLAYER_HIT_SOUNDS, snd_folder)
-        ## TODO - Find other sound for this
+        # TODO - Find other sound for this
         self.enemy_hit_sounds = utils.load_sounds_in_folder(conf.ENEMY_SOUNDS, snd_folder)
         for s in self.enemy_hit_sounds:
             s.set_volume(.2)
-
 
     def new(self):
         # initialize all variables and do all the setup for a new game
@@ -100,8 +99,8 @@ class Game:
         self.paused = False
 
         self.camera = Camera(self, self.maps[self.map_progress].width, self.maps[self.map_progress].height)
-        self.background = Background(self, conf.vec(self.maps[self.map_progress].width/4, self.maps[self.map_progress].height/4))
-        print(len(self.all_sprites))
+        self.background = Background(self, conf.vec(
+            self.maps[self.map_progress].width / 4, self.maps[self.map_progress].height / 4))
         self.soundManager.play_sound_effect(self.effect_sounds['level_start'])
 
     def run(self):
@@ -118,7 +117,7 @@ class Game:
 
     def quit(self):
         pg.quit()
-        #sys.exit()
+        #TODO sys.exit()??
 
     def update(self):
         # update portion of the game loop
@@ -132,23 +131,32 @@ class Game:
 
         #HUD
         utils.draw_player_health(self.screen, 10, 10, self.player.health)
-        utils.draw_text(self, 'FPS ' + '{:.2f}'.format(self.clock.get_fps()), self.title_font, conf.DEFAULT_FONT_SIZE, conf.WHITE, 120, 10, align = 'nw')
-        utils.draw_text(self, 'Points ' + '{}'.format(self.points + self.player.points_current_level), self.title_font, conf.DEFAULT_FONT_SIZE, conf.WHITE, 10, conf.HEIGHT-10, align = 'sw')
+        utils.draw_text(self, 'FPS ' + '{:.2f}'.format(self.clock.get_fps()),
+                        self.title_font, conf.DEFAULT_FONT_SIZE, conf.WHITE, 120, 10, align='nw')
+        utils.draw_text(self, 'Points ' + '{}'.format(self.points + self.player.points_current_level),
+                        self.title_font, conf.DEFAULT_FONT_SIZE, conf.WHITE, 10, conf.HEIGHT - 10, align='sw')
         if (self.player.secondary_weapon_bullets > 0):
-            utils.draw_text(self, 'Secondary weapon: {} | ammo:{: 3d}'.format(self.player.secondary_weapon, self.player.secondary_weapon_bullets), self.title_font, 24, conf.WHITE, conf.WIDTH-10, conf.HEIGHT-10, align = 'se')
+            utils.draw_text(self, 'Secondary weapon: {} | ammo:{: 3d}'.format(self.player.secondary_weapon,
+                            self.player.secondary_weapon_bullets), 
+                            self.title_font, 24, conf.WHITE, conf.WIDTH - 10, conf.HEIGHT - 10, align='se')
         if self.paused:
-            self.screen.blit(self.dim_screen_img, (0,0))
-            utils.draw_text(self, 'Paused', self.title_font, 105, conf.RED, conf.WIDTH/2, conf.HEIGHT/2, 'center')
-            utils.draw_text(self, 'Press P to unpause game', self.title_font, conf.DEFAULT_FONT_SIZE, conf.WHITE, conf.WIDTH, 0, 'ne')
-            utils.draw_text(self, 'Press M to toggle mute', self.title_font, conf.DEFAULT_FONT_SIZE, conf.WHITE, conf.WIDTH, 24, 'ne')
-            utils.draw_text(self, 'Press R to restart game', self.title_font, conf.DEFAULT_FONT_SIZE, conf.WHITE, conf.WIDTH, 48, 'ne')
+            self.screen.blit(self.dim_screen_img, (0, 0))
+            utils.draw_text(self, 'Paused', self.title_font, 105, conf.RED, conf.WIDTH / 2, conf.HEIGHT / 2, 'center')
+            utils.draw_text(self, 'Press P to unpause game', self.title_font,
+                            conf.DEFAULT_FONT_SIZE, conf.WHITE, conf.WIDTH, 0, 'ne')
+            utils.draw_text(self, 'Press M to toggle mute', self.title_font,
+                            conf.DEFAULT_FONT_SIZE, conf.WHITE, conf.WIDTH, 24, 'ne')
+            utils.draw_text(self, 'Press R to restart game', self.title_font,
+                            conf.DEFAULT_FONT_SIZE, conf.WHITE, conf.WIDTH, 48, 'ne')
         else:
-            utils.draw_text(self, 'Press P to pause game', self.title_font, conf.DEFAULT_FONT_SIZE, conf.WHITE, conf.WIDTH-10, 10, 'ne')
+            utils.draw_text(self, 'Press P to pause game', self.title_font,
+                            conf.DEFAULT_FONT_SIZE, conf.WHITE, conf.WIDTH - 10, 10, 'ne')
         if len(self.mobs) == 0:
-            utils.draw_text(self, 'No more enemies', self.title_font, 64, conf.GREEN2, conf.WIDTH/2, conf.HEIGHT/4, 'center')
-            utils.draw_text(self, 'Press Space to go to next level', self.title_font, 64, conf.WHITE, conf.WIDTH/2, conf.HEIGHT/4+70, 'center')
+            utils.draw_text(self, 'No more enemies', self.title_font, 64,
+                            conf.GREEN2, conf.WIDTH / 2, conf.HEIGHT / 4, 'center')
+            utils.draw_text(self, 'Press Space to go to next level', self.title_font, 64,
+                            conf.WHITE, conf.WIDTH / 2, conf.HEIGHT / 4 + 70, 'center')
         pg.display.flip()
-
 
     def events(self):
         # catch all events here

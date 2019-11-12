@@ -78,40 +78,29 @@ def load_files_in_folder(filenames, folder, filetype):
             loaded_files[i] = []
             if type(filenames[i]) is list:
                 for file in filenames[i]:
-                    if (filetype == 'sound'):
-                        s = pg.mixer.Sound(path.join(folder, file))
-                        s.set_volume(0.1)
-                        loaded_files[i].append(s)
-                    if (filetype == 'image'):
-                        loaded_files[i].append(pg.image.load(path.join(folder, file)).convert_alpha())
+                    loaded_files[i].append(load_single_file(folder, file, filetype))
             elif type(i) is str:
-                if (filetype == 'sound'):
-                    s = pg.mixer.Sound(path.join(folder, filenames[i]))
-                    s.set_volume(0.1)
-                    loaded_files[i] = s
-                if (filetype == 'image'):
-                    loaded_files[i] = pg.image.load(path.join(folder, filenames[i])).convert_alpha()
+                loaded_files[i] = load_single_file(folder, filenames[i], filetype)
         return loaded_files
     if type(filenames) is list:
         loaded_files = []
         for file in filenames:
-            if (filetype == 'sound'):
-                s = pg.mixer.Sound(path.join(folder, file))
-                s.set_volume(0.1)
-                loaded_files.append(s)
-            elif (filetype == 'image'):
-                loaded_files.append(pg.image.load(path.join(folder, file)).convert_alpha())
+            loaded_files.append(load_single_file(folder, file, filetype))
         return loaded_files
     if type(filenames) is str:
-        file = None
-        if filetype == 'sound':
-            s = pg.mixer.Sound(path.join(folder, filenames))
-            s.set_volume(0.1)
-            file = s
-        elif filetype == 'image':
-            file = pg.image.load(path.join(folder, filenames)).convert_alpha()
-        return file
+        return load_single_file(folder, filenames, filetype)
     return None
+
+def load_single_file(folder, filename, filetype):
+    if (filetype == 'sound'):
+        s = pg.mixer.Sound(path.join(folder,filename))
+        s.set_volume(0.1)
+        return s
+    elif (filetype == 'image'):
+        return pg.image.load(path.join(folder, filename)).convert_alpha()
+    else:
+        print('file ' + filename + " of type " + filetype + " was not found in folder " + folder)
+        return None
 
 def load_sounds_in_folder(filenames, folder):
     return load_files_in_folder(filenames, folder, 'sound')
