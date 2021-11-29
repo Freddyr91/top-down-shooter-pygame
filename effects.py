@@ -17,6 +17,7 @@ class Bullet(conf.pg.sprite.Sprite):
         self.rect.center = pos
         self.vel = dir * conf.WEAPONS[type]['speed'] * conf.random.uniform(0.9, 1.1)
         self.spawn_time = conf.pg.time.get_ticks()
+
     def update(self):
         self.pos += self.vel * self.game.dt
         self.rect.center = self.pos

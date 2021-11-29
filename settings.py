@@ -140,7 +140,7 @@ WEAPONS['shotgun'] = {'ammo': 12,
                       'lifetime': 500,
                       'rate': 900,
                       'kickback': 600,
-                      'spread': 20,
+                      'spread': 100,
                       'damage': 2,
                       'bullet_count': 42,
                       'solid': True}

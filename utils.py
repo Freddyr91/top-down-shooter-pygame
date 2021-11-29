@@ -25,51 +25,9 @@ def collide_with_walls(sprite, group, dir):
 
 def collide_hit_rect(one, two):
     if hasattr(two, "hit_rect") and hasattr(two, "type"):
-        print (one.hit_rect, two.hit_rect)
+        print(one.hit_rect, two.hit_rect)
         return one.hit_rect.colliderect(two.hit_rect)
     return one.hit_rect.colliderect(two.rect)
-
-#HUD
-def draw_player_health(surf, x, y, health):
-    if health < 0:
-        health = 0
-    conf.BAR_LENGTH = 100
-    conf.BAR_HEIGHT = 20
-    fill = health / 100.0 * conf.BAR_LENGTH
-    outline_rect = pg.Rect(x, y, conf.BAR_LENGTH, conf.BAR_HEIGHT)
-    fill_rect = pg.Rect(x, y, fill, conf.BAR_HEIGHT)
-    if health > conf.PLAYER_HEALTH * 0.6:
-        col = conf.GREEN
-    elif health > conf.PLAYER_HEALTH * 0.3:
-        col = conf.YELLOW
-    else:
-        col = conf.RED
-    pg.draw.rect(surf, col, fill_rect)
-    pg.draw.rect(surf, conf.WHITE, outline_rect, 2)
-
-def draw_text(self, text, font_name, size, color, x, y, align="nw"):
-        font = pg.font.Font(self.asset_folder + "/" + font_name, size)
-        text_surface = font.render(text, True, color)
-        text_rect = text_surface.get_rect()
-        if align == "nw":
-            text_rect.topleft = (x, y)
-        if align == "ne":
-            text_rect.topright = (x, y)
-        if align == "sw":
-            text_rect.bottomleft = (x, y)
-        if align == "se":
-            text_rect.bottomright = (x, y)
-        if align == "n":
-            text_rect.midtop = (x, y)
-        if align == "s":
-            text_rect.midbottom = (x, y)
-        if align == "e":
-            text_rect.midright = (x, y)
-        if align == "w":
-            text_rect.midleft = (x, y)
-        if align == "center":
-            text_rect.center = (x, y)
-        self.screen.blit(text_surface, text_rect)
 
 def load_files_in_folder(filenames, folder, filetype):
     if type(filenames) is dict:

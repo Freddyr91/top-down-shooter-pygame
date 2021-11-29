@@ -50,7 +50,6 @@ class Player(pg.sprite.Sprite):
         self.get_keys()
         mouse_dir = conf.vec(self.game.camera.mouseadjustment(pg.mouse.get_pos())) - conf.vec(self.pos)
         self.rot = mouse_dir.angle_to(conf.vec(1,0))
-        posBefore = self.pos
         self.pos += self.vel * self.game.dt
         if self.vel != conf.vec(0,0):
             self.image = utils.rotate_image(self.game.player_imgs[1], self.rot)
@@ -96,9 +95,8 @@ class Player(pg.sprite.Sprite):
             dir = conf.vec(1, 0).rotate(-self.rot)
             pos = self.pos + conf.BARREL_OFFSET.rotate(-self.rot)
             self.vel = conf.vec(-conf.WEAPONS[weapon]['kickback'], 0).rotate(-self.rot)
-            spread_list = []
             for i in range(conf.WEAPONS[weapon]['bullet_count']):
-                spread = conf.random.uniform(-conf.WEAPONS[weapon]['spread'], conf.WEAPONS[weapon]['spread'])   
+                spread = conf.random.uniform(-conf.WEAPONS[weapon]['spread'], conf.WEAPONS[weapon]['spread'])
                 Bullet(self.game, pos, dir.rotate(spread), weapon)
             if (weapon != self.main_weapon):
                 self.secondary_weapon_bullets -= 1
